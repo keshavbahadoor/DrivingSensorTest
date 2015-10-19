@@ -19,11 +19,13 @@ public class SensorService extends Service implements SensorEventListener {
 
     public static final String BROADCAST_ACTION = "SENSOR_ACTION";
 
-    protected float SENSOR_SENSITIVITY = 0.5F;
-    protected long prevTimeStamp = 0L;
-    protected SensorEnum sensorEnum;
-    protected SensorManager sensorManager;
-    protected Sensor accelerometerSensor;
+    private float SENSOR_SENSITIVITY = 0.5F;
+    private long prevTimeStamp = 0L;
+    private SensorEnum sensorEnum;
+    private SensorManager sensorManager;
+    private Sensor accelerometerSensor;
+    private Sensor gyroscopeSensor;
+    private Sensor rotationSensor;
 
 
     /**
@@ -40,9 +42,16 @@ public class SensorService extends Service implements SensorEventListener {
         super.onCreate();
 
         this.sensorManager = (SensorManager) this.getApplicationContext().getSystemService( Context.SENSOR_SERVICE );
-        this.accelerometerSensor = sensorManager.getDefaultSensor( Sensor.TYPE_ACCELEROMETER );
+
+        // init sensors
+        accelerometerSensor = sensorManager.getDefaultSensor( Sensor.TYPE_ACCELEROMETER );
+        gyroscopeSensor = sensorManager.getDefaultSensor( Sensor.TYPE_GYROSCOPE );
+        rotationSensor = sensorManager.getDefaultSensor( Sensor.TYPE_ROTATION_VECTOR );
 
         sensorManager.registerListener( this, accelerometerSensor, SensorManager.SENSOR_DELAY_NORMAL );
+        sensorManager.registerListener( this, gyroscopeSensor, SensorManager.SENSOR_DELAY_NORMAL );
+        sensorManager.registerListener( this, rotationSensor, SensorManager.SENSOR_DELAY_NORMAL );
+
         Toast.makeText( this.getApplicationContext(), "Sensor service started", Toast.LENGTH_SHORT ).show();
     }
 
@@ -69,19 +78,31 @@ public class SensorService extends Service implements SensorEventListener {
     @Override
     public void onSensorChanged( SensorEvent event ) {
 
-
-
         if ( (event.timestamp - prevTimeStamp) / 1000000000.0 > SENSOR_SENSITIVITY) {
             prevTimeStamp = event.timestamp;
 
             Intent broadcast = new Intent();
             broadcast.setAction( BROADCAST_ACTION );
-            broadcast.putExtra( "accelerometer_x", event.values[0] );
-            broadcast.putExtra( "accelerometer_y", event.values[1] );
-            broadcast.putExtra( "accelerometer_z", event.values[2] );
-            this.sendBroadcast( broadcast );
 
-            Log.d( "Sensor Values", "X: " + event.values[0] + " Y: " + event.values[1] + " Z: " + event.values[2] );
+            switch ( event.sensor.getType()  ) {
+
+                case Sensor.TYPE_ACCELEROMETER:
+                    broadcast.putExtra( "accelerometer_x", event.values[0] );
+                    broadcast.putExtra( "accelerometer_y", event.values[1] );
+                    broadcast.putExtra( "accelerometer_z", event.values[2] );
+                    break;
+
+                case Sensor.TYPE_GYROSCOPE:
+                    broadcast.putExtra( "gyroscope", event.values );
+                    break;
+
+                case Sensor.TYPE_ROTATION_VECTOR:
+                    broadcast.putExtra( "rotation", event.values );
+                    break;
+            }
+
+            this.sendBroadcast( broadcast );
+            // Log.d( "Sensor Values", "X: " + event.values[0] + " Y: " + event.values[1] + " Z: " + event.values[2] );
         }
     }
 

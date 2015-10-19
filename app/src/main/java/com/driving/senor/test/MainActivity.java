@@ -40,15 +40,30 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     List<Sensor> availableSensors;
     TextView text, val1, val2, val3, location;
 
+
     /**
      * receives sensor values and sets the text accordingly
      */
     private BroadcastReceiver receiver = new BroadcastReceiver() {
         @Override
         public void onReceive( Context context, Intent intent ) {
-            val1.setText( "X : " + intent.getFloatExtra( "accelerometer_x", 0.0F ) );
-            val2.setText( "Y : " + intent.getFloatExtra( "accelerometer_y", 0.0F ) );
-            val3.setText( "Z : " + intent.getFloatExtra( "accelerometer_z", 0.0F ) );
+
+            if ( intent.hasExtra( "accelerometer_x" ) ) {
+                val1.setText( "X: " + intent.getFloatExtra( "accelerometer_x", 0.0F ) );
+                val2.setText( "Y: " + intent.getFloatExtra( "accelerometer_y", 0.0F ) );
+                val3.setText( "Z: " + intent.getFloatExtra( "accelerometer_z", 0.0F ) );
+            }
+            if (intent.hasExtra( "gyroscope" )) {
+                LogService.log( intent.getIntArrayExtra( "gyroscope" ).toString() );
+                ( (TextView) findViewById( R.id.value_gyro_X ) ).setText( "X: " + intent.getIntArrayExtra( "gyroscope" )[0] );
+                ((TextView)  findViewById( R.id.value_gyro_Y )).setText( "Y: " + intent.getIntArrayExtra( "gyroscope" )[1] );
+                ((TextView)  findViewById( R.id.value_gyro_Z )).setText( "Z: " + intent.getIntArrayExtra( "gyroscope" )[2] );
+            }
+            if ( intent.hasExtra( "rotation" ) ) {
+                ((TextView)  findViewById( R.id.value_orientation_X )).setText( "X: " + intent.getIntArrayExtra( "rotation" )[0] );
+                ((TextView)  findViewById( R.id.value_orientation_Y )).setText( "Y: " + intent.getIntArrayExtra( "rotation" )[1] );
+                ((TextView)  findViewById( R.id.value_orientation_Z )).setText( "Z: " + intent.getIntArrayExtra( "rotation" )[2] );
+            }
         }
     };
     private BroadcastReceiver locationReceiver = new BroadcastReceiver() {

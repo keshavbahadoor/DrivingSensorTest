@@ -97,6 +97,8 @@ public class LocationService implements LocationListener  {
             latitude = 0.0;
             locationManager = (LocationManager) context.getSystemService(Context.LOCATION_SERVICE);
 
+            // TODO : can just check if location manager is null here
+
             // Get GPS and network status
             isGPSEnabled = locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER);
             isNetworkEnabled = locationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER);
