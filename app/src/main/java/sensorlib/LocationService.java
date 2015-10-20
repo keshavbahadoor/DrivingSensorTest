@@ -97,47 +97,46 @@ public class LocationService implements LocationListener  {
             latitude = 0.0;
             locationManager = (LocationManager) context.getSystemService(Context.LOCATION_SERVICE);
 
-            // TODO : can just check if location manager is null here
+            if ( locationManager != null ) {
 
-            // Get GPS and network status
-            isGPSEnabled = locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER);
-            isNetworkEnabled = locationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER);
+                // Get GPS and network status
+                isGPSEnabled = locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER);
+                isNetworkEnabled = locationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER);
 
-            if (forceNetwork) isGPSEnabled = false;
+                if (forceNetwork) isGPSEnabled = false;
 
-            if (!isNetworkEnabled && !isGPSEnabled)    {
-                // cannot get location
-                this.locationServiceAvailable = false;
-            }
-            //else
-            {
-                this.locationServiceAvailable = true;
-
-                if (isNetworkEnabled) {
-                    locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER,
-                            MIN_TIME_BW_UPDATES,
-                            MIN_DISTANCE_CHANGE_FOR_UPDATES, this);
-                    if (locationManager != null)   {
-                        location = locationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
-                        updateCoordinates();
-                    }
-                }//end if
-
-                if (isGPSEnabled)  {
-                    locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER,
-                            MIN_TIME_BW_UPDATES,
-                            MIN_DISTANCE_CHANGE_FOR_UPDATES, this);
-
-                    if (locationManager != null)  {
-                        location = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
-                        updateCoordinates();
-                    }
+                if (!isNetworkEnabled && !isGPSEnabled)    {
+                    // cannot get location
+                    this.locationServiceAvailable = false;
                 }
-                locationState = LocationEnum.STATIONARY;
+                //else
+                {
+                    this.locationServiceAvailable = true;
+
+                    if (isNetworkEnabled) {
+                        locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER,
+                                MIN_TIME_BW_UPDATES,
+                                MIN_DISTANCE_CHANGE_FOR_UPDATES, this);
+                        if (locationManager != null)   {
+                            location = locationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
+                            updateCoordinates();
+                        }
+                    }//end if
+                    if (isGPSEnabled)  {
+                        locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER,
+                                MIN_TIME_BW_UPDATES,
+                                MIN_DISTANCE_CHANGE_FOR_UPDATES, this);
+
+                        if (locationManager != null)  {
+                            location = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
+                            updateCoordinates();
+                        }
+                    }
+                    locationState = LocationEnum.STATIONARY;
+                }
             }
         } catch (Exception ex)  {
             LogService.log( "Error creating location service: " + ex.getMessage() );
-
         }
     }
 

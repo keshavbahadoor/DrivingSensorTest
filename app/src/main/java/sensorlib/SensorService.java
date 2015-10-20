@@ -12,6 +12,8 @@ import android.support.annotation.Nullable;
 import android.util.Log;
 import android.widget.Toast;
 
+import com.driving.senor.test.LogService;
+
 /**
  * Created by Keshav on 10/4/2015.
  */
@@ -78,7 +80,8 @@ public class SensorService extends Service implements SensorEventListener {
     @Override
     public void onSensorChanged( SensorEvent event ) {
 
-        if ( (event.timestamp - prevTimeStamp) / 1000000000.0 > SENSOR_SENSITIVITY) {
+
+       // if ( (event.timestamp - prevTimeStamp) / 1000000000.0 > SENSOR_SENSITIVITY) {
             prevTimeStamp = event.timestamp;
 
             Intent broadcast = new Intent();
@@ -103,7 +106,7 @@ public class SensorService extends Service implements SensorEventListener {
 
             this.sendBroadcast( broadcast );
             // Log.d( "Sensor Values", "X: " + event.values[0] + " Y: " + event.values[1] + " Z: " + event.values[2] );
-        }
+       // }
     }
 
     @Nullable
