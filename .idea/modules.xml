@@ -3,6 +3,7 @@
   <component name="ProjectModuleManager">
     <modules>
       <module fileurl="file://$PROJECT_DIR$/DrivingSensorTest.iml" filepath="$PROJECT_DIR$/DrivingSensorTest.iml" />
+      <module fileurl="file://$PROJECT_DIR$/SimpleRestClient/SimpleRestClient.iml" filepath="$PROJECT_DIR$/SimpleRestClient/SimpleRestClient.iml" />
       <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
     </modules>
   </component>

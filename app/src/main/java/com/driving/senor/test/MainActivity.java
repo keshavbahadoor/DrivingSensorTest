@@ -28,6 +28,8 @@ import org.w3c.dom.Text;
 
 import java.util.List;
 
+import keshav.com.restservice.RequestType;
+import keshav.com.restservice.RestTask;
 import sensorlib.AccelerometerSensor;
 import sensorlib.LocationService;
 import sensorlib.SensorService;
@@ -84,6 +86,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         // set up GUI accessors
         this.findViewById( R.id.fBtn_actionbutton ).setOnClickListener( this );
         this.findViewById( R.id.btn_getLocation ).setOnClickListener( this );
+        this.findViewById( R.id.btn_testServer ).setOnClickListener( this );
         //text = (TextView) this.findViewById( R.id.sensor_list );
         val1 = (TextView) this.findViewById( R.id.value_acc_X );
         val2 = (TextView) this.findViewById( R.id.value_acc_Y );
@@ -148,6 +151,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         if (v.getId() == R.id.btn_getLocation ) {
             Log.d( "LOCATION", "Latitude : " + locationService.getLatitude() + " Longitude : " + locationService.getLongitude() );
             setLocationResults();
+        }
+        if (v.getId() == R.id.btn_testServer ) {
+            RestTask task = new RestTask( this.getApplicationContext(), RequestType.GET );
+            task.execute(  );
         }
     }
 
