@@ -7,6 +7,7 @@ import android.util.Base64;
 import android.util.Log;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.net.URLConnection;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -15,15 +16,19 @@ import javax.net.ssl.HttpsURLConnection;
 /**
  * Created by Keshav on 10/31/2015.
  */
+@Deprecated
 public class RestTask extends AsyncTask<String, String, String> {
 
+    public static final int HTTP = 1;
+    public static final int HTTPS = 2;
     public static final String BROADCAST_ACTION = "REST_TASK_ACTION";
     private static final String TAG = "RESTTASK";
-    private String REST_URL = "http://jsonplaceholder.typicode.com/posts/1";
+    private String REST_URL = "";
     private int CONENCTION_TIMEOUT = 1000;
     private int READ_TIMEOUT = 10000;
     private Context context;
     private RequestType requestType;
+    private int requestProtocol = HTTP;
 
     // auth stuff
     private String basicAuthCredentials =   "" ;
@@ -44,7 +49,7 @@ public class RestTask extends AsyncTask<String, String, String> {
         headerParamValues = new ArrayList<String>(  );
     }
     public RestTask (Context context, RequestType type) {
-        this(context);
+        this( context );
         this.requestType = type;
     }
 
@@ -57,15 +62,15 @@ public class RestTask extends AsyncTask<String, String, String> {
     @Override
     protected String doInBackground(String... strings) {
 
-        Log.d( TAG, "Do in background triggered" );
-
         String response = "";
         URL url ;
-        HttpURLConnection connection = null;
 
         try {
-            url = new URL(REST_URL);  // todo : use action fragment here
-            connection = (HttpURLConnection) url.openConnection();
+            url = new URL(REST_URL);
+
+
+            HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+            //HttpURLConnection connection = (HttpURLConnection) url.openConnection();
             //connection.setDefaultHostnameVerifier( new NullHostNameVerifier() );
             //connection.setSSLSocketFactory( SSLSocketFactoryService.createSSLSocketFactoryTrustAll() );
 
@@ -90,7 +95,7 @@ public class RestTask extends AsyncTask<String, String, String> {
 
             int responseCode = connection.getResponseCode();
             Log.d(TAG, "Response code: " + responseCode);
-            if (responseCode == HttpsURLConnection.HTTP_OK) {
+            if (responseCode == HttpURLConnection.HTTP_OK) {
                 response = RestUtils.readStream(connection.getInputStream());
             }
             else if (responseCode >= HttpURLConnection.HTTP_BAD_REQUEST) {
@@ -111,7 +116,7 @@ public class RestTask extends AsyncTask<String, String, String> {
     @Override
     protected void onPostExecute(String result) {
 
-        Log.d( TAG, "post execute fired. Result: " + result );
+        Log.d( TAG, "Request fired. Result: " + result );
 
         // Send broadcast
 //        Intent intent = new Intent("intent");
@@ -164,5 +169,19 @@ public class RestTask extends AsyncTask<String, String, String> {
 
     public void setRequestType( RequestType requestType ) {
         this.requestType = requestType;
+    }
+
+    public void setURL(String url) { this.REST_URL = url; }
+
+    public void setReadTimeout( int READ_TIMEOUT ) {
+        this.READ_TIMEOUT = READ_TIMEOUT;
+    }
+
+    public void setConnectionTimeout( int CONENCTION_TIMEOUT ) {
+        this.CONENCTION_TIMEOUT = CONENCTION_TIMEOUT;
+    }
+
+    public void setRequestProtocol( int requestProtocol ) {
+        this.requestProtocol = requestProtocol;
     }
 }

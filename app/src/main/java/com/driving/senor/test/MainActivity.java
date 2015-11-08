@@ -28,6 +28,7 @@ import org.w3c.dom.Text;
 
 import java.util.List;
 
+import keshav.com.restservice.HTTPRestTask;
 import keshav.com.restservice.RequestType;
 import keshav.com.restservice.RestTask;
 import sensorlib.AccelerometerSensor;
@@ -153,7 +154,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             setLocationResults();
         }
         if (v.getId() == R.id.btn_testServer ) {
-            RestTask task = new RestTask( this.getApplicationContext(), RequestType.GET );
+            HTTPRestTask task = new HTTPRestTask( this.getApplicationContext(), RequestType.POST );
+            task.setURL( "http://jsonplaceholder.typicode.com/posts" );
+            task.addBodyParam( "name", "keshav" );
             task.execute(  );
         }
     }
