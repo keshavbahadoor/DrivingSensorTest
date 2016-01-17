@@ -96,11 +96,11 @@ public class SensorService extends Service implements SensorEventListener {
                     break;
 
                 case Sensor.TYPE_GYROSCOPE:
-                    broadcast.putExtra( "gyroscope", event.values );
+                    broadcast.putExtra( "gyroscope", SensorFilter.applyLowPassFilterRounded( event.values ) );
                     break;
 
                 case Sensor.TYPE_ROTATION_VECTOR:
-                    broadcast.putExtra( "rotation", event.values );
+                    broadcast.putExtra( "rotation", SensorFilter.applyLowPassFilterRounded( event.values) );
                     break;
             }
 

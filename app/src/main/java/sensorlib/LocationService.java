@@ -13,8 +13,12 @@ import android.os.Bundle;
 import android.support.v4.content.ContextCompat;
 
 import com.driving.senor.test.LogService;
+import com.driving.senor.test.R;
 
 import java.util.Calendar;
+
+import keshav.com.restservice.HTTPRestTask;
+import keshav.com.restservice.RequestType;
 
 /**
  * Created by Keshav on 10/11/2015.
@@ -31,10 +35,10 @@ public class LocationService implements LocationListener  {
     public static int MY_PERMISSION_ACCESS_COURSE_LOCATION;
 
     //The minimum distance to change updates in meters
-    private static final long MIN_DISTANCE_CHANGE_FOR_UPDATES = 0; // 10 meters
+    private static final long MIN_DISTANCE_CHANGE_FOR_UPDATES = 10; // 10 meters
 
     //The minimum time between updates in milliseconds
-    private static final long MIN_TIME_BW_UPDATES = 0;//1000 * 60 * 1; // 1 minute
+    private static final long MIN_TIME_BW_UPDATES = 30000;//1000 * 60 * 1; // 1 minute
 
     private final static boolean forceNetwork = false;
 
@@ -50,7 +54,7 @@ public class LocationService implements LocationListener  {
     private boolean isGPSEnabled;
     private boolean isNetworkEnabled;
     private boolean locationServiceAvailable;
-    private LocationEnum locationState;
+    public LocationEnum locationState;
 
     public float speed = 0.0F;
     public float maxSpeed = 0.0F;
@@ -177,10 +181,25 @@ public class LocationService implements LocationListener  {
         this.location = newLocation;
         updateCoordinates();
         calculateSpeed(newLocation );
+        sendData();
 
         Intent broadcast = new Intent();
         broadcast.setAction( BROADCAST_ACTION );
         context.sendBroadcast( broadcast );
+    }
+
+    /**
+     * Packages and sends data to the server
+     */
+    private void sendData() {
+
+        HTTPRestTask task = new HTTPRestTask( this.context, RequestType.POST );
+        task.setURL( context.getString( R.string.SERVER ) + "addlocationdata" );
+        task.addHeaderParam( "X-API-KEY", context.getString( R.string.ApiKey ));
+        task.addBodyParam( "latitude", this.latitude );
+        task.addBodyParam( "longitude", this.longitude );
+        task.addBodyParam( "speed", String.format("%.4f", (speed * 3.6)));
+        task.execute(  );
     }
 
     @Override

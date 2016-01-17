@@ -9,6 +9,7 @@ import android.content.pm.PackageManager;
 import android.hardware.Sensor;
 import android.hardware.SensorManager;
 import android.location.Location;
+import android.opengl.Visibility;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
@@ -32,6 +33,7 @@ import keshav.com.restservice.HTTPRestTask;
 import keshav.com.restservice.RequestType;
 import keshav.com.restservice.RestTask;
 import sensorlib.AccelerometerSensor;
+import sensorlib.LocationEnum;
 import sensorlib.LocationService;
 import sensorlib.SensorService;
 import sensorlib.SensorTemplate;
@@ -41,7 +43,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private LocationService locationService;
     private static int PERMISSIONS_ACCEPTED;
     List<Sensor> availableSensors;
-    TextView text, val1, val2, val3, location;
+    TextView val1, val2, val3, location, onFoot, inVehicle;
 
 
     /**
@@ -87,13 +89,15 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         // set up GUI accessors
         this.findViewById( R.id.fBtn_actionbutton ).setOnClickListener( this );
         this.findViewById( R.id.btn_getLocation ).setOnClickListener( this );
-        this.findViewById( R.id.btn_testServer ).setOnClickListener( this );
         //text = (TextView) this.findViewById( R.id.sensor_list );
         val1 = (TextView) this.findViewById( R.id.value_acc_X );
         val2 = (TextView) this.findViewById( R.id.value_acc_Y );
         val3 = (TextView) this.findViewById( R.id.value_acc_Z );
+        onFoot = (TextView) this.findViewById( R.id.tv_onfoot );
+        inVehicle = (TextView) this.findViewById( R.id.tv_invehicle );
         location = (TextView) this.findViewById( R.id.tv_locationdata );
 
+        inVehicle.setVisibility( View.GONE );
         // List available sensors
         //availableSensors = ((SensorManager)this.getSystemService( Context.SENSOR_SERVICE )).getSensorList( Sensor.TYPE_ALL );
         //text.setText( "Available Sensors: \n\n" );
@@ -118,19 +122,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
      * Needed for Android 6.0
      */
     private void checkApplicationPermissions() {
-
-        // List of Permissions we need
-//        String[] permissions = {
-//                android.Manifest.permission.ACCESS_COARSE_LOCATION,
-//                Manifest.permission.ACCESS_FINE_LOCATION
-//        };
-//
-//        for (int i=0; i<permissions.length; i++ ) {
-//            if (ContextCompat.checkSelfPermission( this, permissions[i] ) != PackageManager.PERMISSION_GRANTED) {
-//                ActivityCompat.requestPermissions( this, permissions);
-//            }
-//        }
-
+ 
         if ( ContextCompat.checkSelfPermission( this, android.Manifest.permission.ACCESS_COARSE_LOCATION ) != PackageManager.PERMISSION_GRANTED ) {
 
             ActivityCompat.requestPermissions( this, new String[] {  android.Manifest.permission.ACCESS_COARSE_LOCATION  },
@@ -153,12 +145,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             Log.d( "LOCATION", "Latitude : " + locationService.getLatitude() + " Longitude : " + locationService.getLongitude() );
             setLocationResults();
         }
-        if (v.getId() == R.id.btn_testServer ) {
-            HTTPRestTask task = new HTTPRestTask( this.getApplicationContext(), RequestType.POST );
-            task.setURL( "http://jsonplaceholder.typicode.com/posts" );
-            task.addBodyParam( "name", "keshav" );
-            task.execute(  );
-        }
+
     }
 
     private void setLocationResults()
@@ -168,6 +155,15 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         location.append( "LONG : " + locationService.getLongitude() + "\n" );
         location.append( "Speed: " + String.format("%.4f", (locationService.speed * 3.6)) + "\n" );
         location.append( "Max Speed: " + String.format("%.4f", (locationService.maxSpeed * 3.6)) + "\n" );
+
+        if (locationService.locationState == LocationEnum.IN_VEHICLE ) {
+            inVehicle.setVisibility( View.VISIBLE );
+            onFoot.setVisibility( View.GONE );
+        }
+        else {
+            inVehicle.setVisibility( View.GONE );
+            onFoot.setVisibility( View.VISIBLE );
+        }
     }
 
     @Override
