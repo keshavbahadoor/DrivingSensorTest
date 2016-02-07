@@ -4,7 +4,6 @@ import android.annotation.TargetApi;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
-import android.content.pm.PermissionInfo;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
@@ -12,7 +11,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.content.ContextCompat;
 
-import com.driving.senor.test.LogService;
+import util.LogService;
 import com.driving.senor.test.R;
 
 import java.util.Calendar;
@@ -151,21 +150,25 @@ public class LocationService implements LocationListener  {
     private void calculateSpeed(Location location) {
         speed = location.getSpeed();
 
-        // Speed = distance / time in ms^-1
-        calculateSpeed = (location.distanceTo( previousLocation ) / (Calendar.getInstance().getTimeInMillis() - previousTimeStamp) * 1000);
-        previousTimeStamp = Calendar.getInstance().getTimeInMillis();
+        try {
+            // Speed = distance / time in ms^-1
+            calculateSpeed = ( location.distanceTo( previousLocation ) / ( Calendar.getInstance().getTimeInMillis() - previousTimeStamp ) * 1000 );
+            previousTimeStamp = Calendar.getInstance().getTimeInMillis();
 
-        if (speed <= IN_VEHICLE_THRESHHOLD) {
-            locationState = LocationEnum.STATIONARY;
-        }
-        if (speed > IN_VEHICLE_THRESHHOLD) {
-            locationState = LocationEnum.IN_VEHICLE;
-        }
-        if (speed > maxSpeed) {
-            maxSpeed = speed;
-        }
-        if (calculateSpeed > maxCalculatedSpeed) {
-            maxCalculatedSpeed = calculateSpeed;
+            if ( speed <= IN_VEHICLE_THRESHHOLD ) {
+                locationState = LocationEnum.STATIONARY;
+            }
+            if ( speed > IN_VEHICLE_THRESHHOLD ) {
+                locationState = LocationEnum.IN_VEHICLE;
+            }
+            if ( speed > maxSpeed ) {
+                maxSpeed = speed;
+            }
+            if ( calculateSpeed > maxCalculatedSpeed ) {
+                maxCalculatedSpeed = calculateSpeed;
+            }
+        } catch ( Exception ex ) {
+            LogService.log( "Error performing LocationService calculation: " + ex.getMessage() );
         }
     }
 

@@ -3,4 +3,11 @@
     <string name="action_settings">Settings</string>
     <string name="ApiKey">YWUZzv7W9E2lBHJxl7jJXfVo670d6K5g</string>
     <string name="SERVER">http://104.236.253.74/</string>
+
+    <string-array name="tabs">
+        <item>Sensors</item>
+        <item>GPS</item>
+        <item>Log</item>
+    </string-array>
+
 </resources>

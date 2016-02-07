@@ -12,8 +12,6 @@ import android.support.annotation.Nullable;
 import android.util.Log;
 import android.widget.Toast;
 
-import com.driving.senor.test.LogService;
-
 /**
  * Created by Keshav on 10/4/2015.
  */
@@ -28,7 +26,7 @@ public class SensorService extends Service implements SensorEventListener {
     private Sensor accelerometerSensor;
     private Sensor gyroscopeSensor;
     private Sensor rotationSensor;
-
+    private Sensor gravitySensor;
 
     /**
      * Constructor
@@ -49,12 +47,17 @@ public class SensorService extends Service implements SensorEventListener {
         accelerometerSensor = sensorManager.getDefaultSensor( Sensor.TYPE_ACCELEROMETER );
         gyroscopeSensor = sensorManager.getDefaultSensor( Sensor.TYPE_GYROSCOPE );
         rotationSensor = sensorManager.getDefaultSensor( Sensor.TYPE_ROTATION_VECTOR );
+        gravitySensor = sensorManager.getDefaultSensor( Sensor.TYPE_GRAVITY );
 
         sensorManager.registerListener( this, accelerometerSensor, SensorManager.SENSOR_DELAY_NORMAL );
         sensorManager.registerListener( this, gyroscopeSensor, SensorManager.SENSOR_DELAY_NORMAL );
         sensorManager.registerListener( this, rotationSensor, SensorManager.SENSOR_DELAY_NORMAL );
+        sensorManager.registerListener( this, gravitySensor, SensorManager.SENSOR_DELAY_NORMAL );
 
         Toast.makeText( this.getApplicationContext(), "Sensor service started", Toast.LENGTH_SHORT ).show();
+
+        Log.d( "SENSOR_SERVICE", "Accelerometer Max: " + accelerometerSensor.getMaximumRange() );
+        Log.d( "SENSOR_SERVICE", "Gyroscope Max: " + gyroscopeSensor.getMaximumRange() );
     }
 
     @Override
@@ -79,8 +82,6 @@ public class SensorService extends Service implements SensorEventListener {
 
     @Override
     public void onSensorChanged( SensorEvent event ) {
-
-
        // if ( (event.timestamp - prevTimeStamp) / 1000000000.0 > SENSOR_SENSITIVITY) {
             prevTimeStamp = event.timestamp;
 
@@ -90,9 +91,7 @@ public class SensorService extends Service implements SensorEventListener {
             switch ( event.sensor.getType()  ) {
 
                 case Sensor.TYPE_ACCELEROMETER:
-                    broadcast.putExtra( "accelerometer_x", event.values[0] );
-                    broadcast.putExtra( "accelerometer_y", event.values[1] );
-                    broadcast.putExtra( "accelerometer_z", event.values[2] );
+                    broadcast.putExtra( "accelerometer", SensorFilter.applyLowPassFilterRounded(  SensorFilter.applyHighPassFilter( event.values ) ) );
                     break;
 
                 case Sensor.TYPE_GYROSCOPE:
@@ -101,6 +100,10 @@ public class SensorService extends Service implements SensorEventListener {
 
                 case Sensor.TYPE_ROTATION_VECTOR:
                     broadcast.putExtra( "rotation", SensorFilter.applyLowPassFilterRounded( event.values) );
+                    break;
+
+                case Sensor.TYPE_GRAVITY:
+                    broadcast.putExtra( "gravity", SensorFilter.applyLowPassFilterRounded( event.values) );
                     break;
             }
 
