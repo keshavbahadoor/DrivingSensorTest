@@ -99,7 +99,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     public void signOutUser(MenuItem item){
         googlePlusHandler.gSignOut();
-        Toast.makeText(this, "You have signed out", Toast.LENGTH_SHORT).show();
+        Toast.makeText(this, "You have signed out", Toast.LENGTH_LONG).show();
+        this.finish();
+        // kill any background services
     }
 
     /**

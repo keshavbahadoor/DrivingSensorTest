@@ -1,6 +1,5 @@
 package user.management;
 
-import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
@@ -42,17 +41,16 @@ public class GooglePlusHandler implements GoogleApiClient.OnConnectionFailedList
         context = mainActivity.getApplicationContext();
         progressDialog = new ProgressDialog( mainActivity );
         progressDialog.setMessage( "Signing in..." );
-        initSignInProcess();
+        buildGoogleServices();
     }
 
     /**
-     * If user has not signed in already,
-     * initiate sign in process
+     * Creates google sign in options object, and google api client object.
+     * Attempts connection
      */
-    public void initSignInProcess() {
+    public void buildGoogleServices() {
 
-        if ( ! isSignedIn()) {
-
+        try {
             GoogleSignInOptions gso = new GoogleSignInOptions.Builder( GoogleSignInOptions.DEFAULT_SIGN_IN )
                     .requestEmail()
                     .build();
@@ -61,8 +59,9 @@ public class GooglePlusHandler implements GoogleApiClient.OnConnectionFailedList
                     .addApi( Auth.GOOGLE_SIGN_IN_API, gso )
                     .addConnectionCallbacks( this )
                     .build();
-            setSignedIn( true );
             googleApiClient.connect();
+        }  catch ( Exception ex ) {
+            LogService.log( "Error building google api services: " + ex.getMessage() );
         }
     }
 
@@ -76,10 +75,11 @@ public class GooglePlusHandler implements GoogleApiClient.OnConnectionFailedList
     public boolean isSignedIn() {
         try {
             SharedPreferences prefs = context.getSharedPreferences( GOOGLE_SIGN_IN_STORE, Context.MODE_PRIVATE );
-            Boolean signedIn = prefs.getBoolean( SIGNED_IN_PREFERENCE, false );
+            boolean signedIn = prefs.getBoolean( SIGNED_IN_PREFERENCE, false );
             LogService.log( "User Signed in? : " + signedIn );
             return signedIn;
         } catch ( Exception ex ) {
+            LogService.log( "Exception checking prefs: " + ex.getMessage() );
             return false;
         }
     }
