@@ -1,12 +1,3 @@
 <?xml version="1.0" encoding="utf-8"?>
-<items version="2" >
+<items version="2" />
 
-    <item
-        jar="C:\SRC\android\DrivingSensorTest\app\build\intermediates\exploded-aar\DrivingSensorTest\SimpleRestClient\unspecified\jars\classes.jar"
-        jumboMode="false"
-        revision="23.0.1"
-        sha1="e246c1f2f4132d9ea70eb2a608033eb65c126c99">
-        <dex dex="C:\SRC\android\DrivingSensorTest\app\build\intermediates\pre-dexed\debug\classes-6a592170f9a6ea34e2ea76cbb11373e132c82865.jar" />
-    </item>
-
-</items>
