@@ -1,14 +1,10 @@
-package util;
+package keshav.com.utilitylib;
 
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.Context;
-import android.view.LayoutInflater;
 import android.view.View;
-
-import com.driving.senor.test.MainActivity;
-import com.driving.senor.test.R;
 
 /**
  * Created by Keshav on 1/17/2016.
@@ -24,10 +20,10 @@ public class DialogFactory
                 .show();
     }
 
-    public static Dialog getSignInDialog( Activity activity, String title )
+    public static Dialog getSignInDialog( Activity activity, String title, View view )
     {
         Dialog dialog = new Dialog( activity );
-        dialog.setContentView( R.layout.sign_in_dialog );
+        dialog.setContentView( view );
         dialog.setTitle( title );
         return dialog;
     }

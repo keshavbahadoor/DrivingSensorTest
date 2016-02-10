@@ -1,1 +1,1 @@
-include ':app', ':SimpleRestClient'
+include ':app', ':SimpleRestClient', ':DrivingEventLib', ':UtilityLib'

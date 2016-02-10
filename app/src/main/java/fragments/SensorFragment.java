@@ -6,18 +6,17 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.Bundle;
 import android.support.design.widget.Snackbar;
-import android.support.v4.app.Fragment;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
-
+import sensor.lib.SensorService;
 import com.driving.senor.test.R;
 
-import sensorlib.SensorService;
-import util.LogService;
-import util.ServiceUtil;
+import keshav.com.utilitylib.LogService;
+import keshav.com.utilitylib.ServiceUtil;
+
 
 /**
  * Created by Keshav on 1/23/2016.

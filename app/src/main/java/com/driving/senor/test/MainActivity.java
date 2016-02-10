@@ -4,7 +4,6 @@ import android.app.Dialog;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
-import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.view.ViewPager;
@@ -14,12 +13,11 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Toast;
-
-import sensorlib.LocationService;
-import sensorlib.SensorService;
+import sensor.lib.SensorService;
+import sensor.lib.LocationService;
 import user.management.GooglePlusHandler;
-import util.DialogFactory;
-import util.LogService;
+import keshav.com.utilitylib.DialogFactory;
+import keshav.com.utilitylib.LogService;
 
 public class MainActivity extends AppCompatActivity implements View.OnClickListener {
 
@@ -44,7 +42,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         googlePlusHandler = new GooglePlusHandler( this );
         LogService.log( "Started" );
 
-        signInDialog = DialogFactory.getSignInDialog( this, "Sign In" );
+        signInDialog = DialogFactory.getSignInDialog( this, "Sign In", getLayoutInflater().inflate( R.layout.sign_in_dialog, null ) );
         signInDialog.findViewById( R.id.Btn_google_sign_in ).setOnClickListener( this );
         signInDialog.findViewById( R.id.Btn_sign_in_cancel ).setOnClickListener( this );
 

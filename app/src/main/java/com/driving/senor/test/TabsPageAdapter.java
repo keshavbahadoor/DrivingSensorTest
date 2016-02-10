@@ -8,7 +8,7 @@ import android.support.v4.app.FragmentPagerAdapter;
 import fragments.LocationFragment;
 import fragments.LogFragment;
 import fragments.SensorFragment;
-import util.LogService;
+import keshav.com.utilitylib.LogService;
 
 /**
  * Created by Keshav on 1/23/2016.

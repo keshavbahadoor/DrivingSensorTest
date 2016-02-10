@@ -5,8 +5,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.Bundle;
-import android.support.annotation.Nullable;
-import android.support.v4.app.Fragment;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -14,10 +12,9 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import com.driving.senor.test.R;
-
-import sensorlib.LocationEnum;
-import sensorlib.LocationService;
-import util.LogService;
+import sensor.lib.LocationEnum;
+import sensor.lib.LocationService;
+import keshav.com.utilitylib.LogService;
 
 /**
  * Created by Keshav on 1/23/2016.

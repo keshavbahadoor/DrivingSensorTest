@@ -9,7 +9,9 @@
         <option name="modules">
           <set>
             <option value="$PROJECT_DIR$" />
+            <option value="$PROJECT_DIR$/DrivingEventLib" />
             <option value="$PROJECT_DIR$/SimpleRestClient" />
+            <option value="$PROJECT_DIR$/UtilityLib" />
             <option value="$PROJECT_DIR$/app" />
           </set>
         </option>

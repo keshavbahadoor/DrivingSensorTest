@@ -1,3 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
-<items version="2" />
+<items version="2" >
 
+    <item
+        jar="C:\SRC\android\DrivingSensorTest\app\build\intermediates\exploded-aar\DrivingSensorTest\UtilityLib\unspecified\jars\classes.jar"
+        jumboMode="false"
+        revision="23.0.2"
+        sha1="892b2c4544c0098e73aa705a1129c27954befba0">
+        <dex dex="C:\SRC\android\DrivingSensorTest\app\build\intermediates\pre-dexed\debug\DrivingSensorTest-UtilityLib-unspecified_9e727ed03e1f164fe869bb4d7d8a62353731254e.jar" />
+    </item>
+
+</items>

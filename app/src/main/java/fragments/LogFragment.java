@@ -2,7 +2,6 @@ package fragments;
 
 import android.content.Context;
 import android.os.Bundle;
-import android.support.annotation.Nullable;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -10,7 +9,7 @@ import android.widget.TextView;
 
 import com.driving.senor.test.R;
 
-import util.LogService;
+import keshav.com.utilitylib.LogService;
 
 /**
  * Created by Keshav on 1/23/2016.

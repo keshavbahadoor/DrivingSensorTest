@@ -1,4 +1,4 @@
-package util;
+package keshav.com.utilitylib;
 
 import android.app.ActivityManager;
 import android.content.Context;
