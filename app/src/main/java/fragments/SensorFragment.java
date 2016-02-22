@@ -1,6 +1,7 @@
 package fragments;
 
 import android.content.BroadcastReceiver;
+import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
@@ -11,8 +12,14 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
+
+import MessageEvents.AccelerationDataMessage;
+import keshav.com.drivingeventlib.DrivingPatternService;
 import sensor.lib.SensorService;
 import com.driving.senor.test.R;
+
+import org.greenrobot.eventbus.EventBus;
+import org.greenrobot.eventbus.Subscribe;
 
 import keshav.com.utilitylib.LogService;
 import keshav.com.utilitylib.ServiceUtil;
@@ -86,6 +93,12 @@ public class SensorFragment extends android.support.v4.app.Fragment implements V
     };
 
     @Override
+    public void onStart() {
+        super.onStart();
+        EventBus.getDefault().register( this );
+    }
+
+    @Override
     public void onCreate(  Bundle savedInstanceState ) {
         super.onCreate( savedInstanceState );
 
@@ -111,10 +124,6 @@ public class SensorFragment extends android.support.v4.app.Fragment implements V
         fragment.findViewById( R.id.btn_reset ).setOnClickListener( this );
 
         context.registerReceiver( receiver, new IntentFilter( SensorService.BROADCAST_ACTION ) );
-
-
-
-
         return fragment;
     }
 
@@ -127,6 +136,7 @@ public class SensorFragment extends android.support.v4.app.Fragment implements V
         context.stopService( new Intent( context, SensorService.class ) );
         try {
             context.unregisterReceiver( receiver );
+            EventBus.getDefault().unregister( this );
         }
         catch ( Exception ex ) {
             LogService.log( "Receiver not registered" );
@@ -137,7 +147,8 @@ public class SensorFragment extends android.support.v4.app.Fragment implements V
     public void onClick( View v ) {
         if (v.getId() == R.id.fBtn_actionbutton) {
             if ( !ServiceUtil.isServiceRunning( SensorService.class, context )) {
-                context.startService( new Intent( context, SensorService.class ) );
+                // context.startService( new Intent( context, SensorService.class ) );
+                context.startService( new Intent(context, DrivingPatternService.class) );
             }
             else {
                 Snackbar.make( v, "Sensor Service already running", Snackbar.LENGTH_LONG ).show();
@@ -157,6 +168,15 @@ public class SensorFragment extends android.support.v4.app.Fragment implements V
         ( (TextView) fragment.findViewById( id1 ) ).setText( "X: " + vals[0] );
         ( (TextView) fragment.findViewById( id2 ) ).setText( "Y: " + vals[1] );
         ( (TextView) fragment.findViewById( id3 ) ).setText( "Z: " + vals[2] );
+    }
+
+    @Subscribe
+    public void onMessageEvent( AccelerationDataMessage message ) {
+
+        LogService.log( "Received a message" );
+        ( (TextView) fragment.findViewById( R.id.value_acc_X ) ).setText( "X: " + message.sensorVals[0] );
+        ( (TextView) fragment.findViewById( R.id.value_acc_Y ) ).setText( "Y: " + message.sensorVals[1] );
+        ( (TextView) fragment.findViewById( R.id.value_acc_Z ) ).setText( "Z: " + message.sensorVals[2] );
     }
 
 

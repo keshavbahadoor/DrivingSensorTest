@@ -28,6 +28,7 @@
             android:value="@integer/google_play_services_version" />
 
         <service android:enabled="true" android:name="sensor.lib.SensorService"></service>
+        <service android:name="keshav.com.drivingeventlib.DrivingPatternService" android:enabled="true"></service>
 
         <activity
             android:name=".MainActivity"

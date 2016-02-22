@@ -18,6 +18,7 @@ import sensor.lib.LocationService;
 import user.management.GooglePlusHandler;
 import keshav.com.utilitylib.DialogFactory;
 import keshav.com.utilitylib.LogService;
+import user.management.UserData;
 
 public class MainActivity extends AppCompatActivity implements View.OnClickListener {
 
@@ -104,18 +105,22 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     /**
      * Handles the Google plus user sign in after result
+     * sends data to server
+     * stores data locally
      * @param requestCode
      * @param resultCode
-     * @param data
+     * @param intent
      */
     @Override
-    protected void onActivityResult( int requestCode, int resultCode, Intent data ) {
-        super.onActivityResult( requestCode, resultCode, data );
+    protected void onActivityResult( int requestCode, int resultCode, Intent intent ) {
+        super.onActivityResult( requestCode, resultCode, intent );
 
         if (requestCode == googlePlusHandler.RC_SIGN_IN) {
             signInDialog.dismiss();
-            googlePlusHandler.setSignInResult( data );
-            googlePlusHandler.getUserData();
+            googlePlusHandler.setSignInResult( intent );
+
+            UserData data = googlePlusHandler.getUserData();
+            ServerAPI.GoogleSignInRequest( this, data.googleID, data.displayName, data.email, data.googlePhotoURL );
         }
     }
 }

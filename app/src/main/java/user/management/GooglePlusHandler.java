@@ -100,13 +100,20 @@ public class GooglePlusHandler implements GoogleApiClient.OnConnectionFailedList
     /**
      * Initiates a sign in request
      */
-    public void gSignIn() {
-        if (googleApiClient.isConnected()) {
-            signInIntent = Auth.GoogleSignInApi.getSignInIntent( googleApiClient );
-            mainActivity.startActivityForResult( signInIntent, RC_SIGN_IN );
-            progressDialog.show();
-        } else {
-            LogService.log( "WARNING: google api client is not connected" );
+    public boolean gSignIn() {
+        try {
+            if ( googleApiClient.isConnected() ) {
+                signInIntent = Auth.GoogleSignInApi.getSignInIntent( googleApiClient );
+                mainActivity.startActivityForResult( signInIntent, RC_SIGN_IN );
+                progressDialog.show();
+                return true;
+            } else {
+                LogService.log( "WARNING: google api client is not connected" );
+                return false;
+            }
+        } catch ( Exception e ) {
+            LogService.log( "Error signing in with google: " + e.getMessage() );
+            return false;
         }
     }
 
@@ -129,18 +136,25 @@ public class GooglePlusHandler implements GoogleApiClient.OnConnectionFailedList
     /**
      * Gets user data from the currently signed in account
      */
-    public void getUserData() {
+    public UserData getUserData() {
 
-        GoogleSignInResult result = Auth.GoogleSignInApi.getSignInResultFromIntent( signInResultIntent );
-        if (result.isSuccess()) {
+        UserData data = new UserData();
+        try {
+            GoogleSignInResult result = Auth.GoogleSignInApi.getSignInResultFromIntent( signInResultIntent );
+            if ( result.isSuccess() ) {
 
-            GoogleSignInAccount account = result.getSignInAccount();
-            LogService.log("name: " + account.getDisplayName());
-            LogService.log( "email: "  + account.getEmail() );
-            LogService.log( "photo: " + account.getPhotoUrl() );
-        } else {
-            LogService.log( "Sign in was not successful" );
+                GoogleSignInAccount account = result.getSignInAccount();
+                data.googleID = account.getId();
+                data.displayName = account.getDisplayName();
+                data.email =  account.getEmail();
+                data.googlePhotoURL = account.getPhotoUrl().toString();
+            } else {
+                LogService.log( "Sign in was not successful" );
+            }
+        } catch ( Exception ex ) {
+            LogService.log( "Exception occurred while trying to get Google Profile data. "  + ex.getMessage());
         }
+        return data;
     }
 
     /**
@@ -179,10 +193,10 @@ public class GooglePlusHandler implements GoogleApiClient.OnConnectionFailedList
     }
 
     /**
-     * Sign in result intent is used for getting any account related datea
+     * Sign in result intent is used for getting any account related data
      * from the Google Signed in account. This is passed back via intent.
      *
-     * Progress dialog must be dismissed as well as this call is intented for
+     * Progress dialog must be dismissed as well as this call is intended for
      * after the sign in process
      * @param intent
      */
