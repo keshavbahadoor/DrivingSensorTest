@@ -2,6 +2,7 @@ package keshav.com.drivingeventlib;
 
 import android.content.ContentValues;
 import android.content.Context;
+import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 
@@ -13,6 +14,7 @@ import java.util.Date;
  */
 public class LocalStorage extends SQLiteOpenHelper {
 
+    private static LocalStorage instance = null;
     private static final int DB_VERSION = 1;
     private static final String DB_NAME = "LocalDrivingData";
     private static final String COL_ID = "ID";
@@ -38,16 +40,30 @@ public class LocalStorage extends SQLiteOpenHelper {
                                                             COL_ID+ " INTEGER PRIMARY KEY AUTOINCREMENT, " +
                                                             GPSData_latitude + " TEXT, "+GPSData_longitude+" TEXT, "+GPSData_speed+" TEXT, "+COL_TIME+" TEXT)";
     private static final String DROP_TABLE = "DROP TABLE IF EXISTS ";
+    private static final String SELECT_COUNT = "SELECT COUNT(*) FROM ";
+
 
 
     /**
      * Constructor
      * @param context
      */
-    public LocalStorage( Context context  ) {
+    protected LocalStorage( Context context  ) {
         super( context, DB_NAME, null, DB_VERSION );
         dateFormat = new SimpleDateFormat( "yyyy-MM-dd hh:mm:ss" );
         date = new Date();
+    }
+
+    /**
+     * Singleton pattern implementation
+     * @param context
+     * @return
+     */
+    public static LocalStorage getInstance(Context context) {
+        if (instance == null) {
+            instance = new LocalStorage( context );
+        }
+        return instance;
     }
 
     @Override
@@ -99,5 +115,33 @@ public class LocalStorage extends SQLiteOpenHelper {
         values.put( GPSData_speed, speed );
         values.put( COL_TIME, dateFormat.format( date.getTime() ) );
         getReadableDatabase().insert( TABLE_SensorData, null, values );
+    }
+
+    /**
+     * Generic function to get the table row count
+     * @param table
+     * @return
+     */
+    public String getDatabaseCount(String table) {
+        SQLiteDatabase db = this.getReadableDatabase();
+        Cursor cursor = db.rawQuery( SELECT_COUNT + table, null );
+        cursor.moveToFirst();
+        return cursor.getString( 0 );
+    }
+
+    /**
+     * Returns amount of rows in sensor data
+     * @return
+     */
+    public String getSensorDataCount() {
+        return getDatabaseCount( TABLE_SensorData );
+    }
+
+    /**
+     * Returns amount of rows in GPS Data sensor
+     * @return
+     */
+    public String getGPSDataCount() {
+        return getDatabaseCount( TABLE_GPSData );
     }
 }

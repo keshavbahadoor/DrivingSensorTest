@@ -9,6 +9,7 @@ import android.widget.TextView;
 
 import com.driving.senor.test.R;
 
+import keshav.com.drivingeventlib.LocalStorage;
 import keshav.com.utilitylib.LogService;
 
 /**
@@ -23,7 +24,6 @@ public class LogFragment extends android.support.v4.app.Fragment implements View
     @Override
     public void onCreate(  Bundle savedInstanceState ) {
         super.onCreate( savedInstanceState );
-
     }
 
     @Override
@@ -35,6 +35,11 @@ public class LogFragment extends android.support.v4.app.Fragment implements View
 
         logWindow = (TextView) fragment.findViewById( R.id.tv_logs );
         LogService.setLogWindow( logWindow );
+
+        logWindow.append( "Sensor row count: " + LocalStorage.getInstance( context ).getSensorDataCount() );
+        logWindow.append( "\nGPS Data row count: " + LocalStorage.getInstance( context ).getGPSDataCount() );
+
+
         return fragment;
     }
 

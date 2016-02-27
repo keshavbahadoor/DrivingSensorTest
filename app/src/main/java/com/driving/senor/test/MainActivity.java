@@ -1,7 +1,9 @@
 package com.driving.senor.test;
 
 import android.app.Dialog;
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.support.v4.app.ActivityCompat;
@@ -13,8 +15,10 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Toast;
+
+import keshav.com.drivingeventlib.DataCacheService;
 import sensor.lib.SensorService;
-import sensor.lib.LocationService;
+import sensor.lib.CustomLocationListener;
 import user.management.GooglePlusHandler;
 import keshav.com.utilitylib.DialogFactory;
 import keshav.com.utilitylib.LogService;
@@ -22,6 +26,7 @@ import user.management.UserData;
 
 public class MainActivity extends AppCompatActivity implements View.OnClickListener {
 
+    public static final String CURRENT_ACCOUNT_ID_PREF = "ACCOUNT_ID_NUMBER";
     private GooglePlusHandler googlePlusHandler;
     private Dialog signInDialog;
     private Toolbar toolbar;
@@ -60,7 +65,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         if ( ContextCompat.checkSelfPermission( this, android.Manifest.permission.ACCESS_COARSE_LOCATION ) != PackageManager.PERMISSION_GRANTED ) {
 
             ActivityCompat.requestPermissions( this, new String[]{ android.Manifest.permission.ACCESS_COARSE_LOCATION },
-                    LocationService.MY_PERMISSION_ACCESS_COURSE_LOCATION );
+                    CustomLocationListener.MY_PERMISSION_ACCESS_COURSE_LOCATION );
         }
     }
 
@@ -77,7 +82,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     protected void onStop() {
         super.onStop();
         stopService( new Intent( this, SensorService.class ) );
-        stopService( new Intent( this, LocationService.class ) );
+        stopService( new Intent( this, CustomLocationListener.class ) );
     }
 
     @Override
@@ -107,6 +112,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
      * Handles the Google plus user sign in after result
      * sends data to server
      * stores data locally
+     * starts data cach service
      * @param requestCode
      * @param resultCode
      * @param intent
@@ -121,6 +127,12 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
             UserData data = googlePlusHandler.getUserData();
             ServerAPI.GoogleSignInRequest( this, data.googleID, data.displayName, data.email, data.googlePhotoURL );
+
+            SharedPreferences.Editor editor = this.getSharedPreferences( CURRENT_ACCOUNT_ID_PREF, Context.MODE_PRIVATE ).edit();
+            editor.putString( "AccountID", data.googleID );
+            editor.commit();
+
+            this.startService( new Intent( this.getApplicationContext(), DataCacheService.class ) );
         }
     }
 }

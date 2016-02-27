@@ -10,17 +10,18 @@ import android.location.LocationManager;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.content.ContextCompat;
+
+import org.greenrobot.eventbus.EventBus;
+import org.greenrobot.eventbus.Subscribe;
+
 import keshav.com.utilitylib.LogService;
 
 import java.util.Calendar;
 
-import keshav.com.restservice.HTTPRestTask;
-import keshav.com.restservice.RequestType;
-
 /**
  * Created by Keshav on 10/11/2015.
  */
-public class LocationService implements LocationListener  {
+public class CustomLocationListener implements LocationListener  {
 
 
     public static final String BROADCAST_ACTION = "LOCATION_CHANGED";
@@ -39,7 +40,7 @@ public class LocationService implements LocationListener  {
 
     private final static boolean forceNetwork = false;
 
-    private static LocationService instance = null;
+    private static CustomLocationListener instance = null;
 
     private static Context context;
 
@@ -63,9 +64,9 @@ public class LocationService implements LocationListener  {
      * Singleton implementation
      * @return
      */
-    public static LocationService getLocationManager(Context context)     {
+    public static CustomLocationListener getLocationManager(Context context)     {
         if (instance == null) {
-            instance = new LocationService(context);
+            instance = new CustomLocationListener(context);
         }
         return instance;
     }
@@ -73,11 +74,11 @@ public class LocationService implements LocationListener  {
     /**
      * Local constructor
      */
-    private LocationService( Context c )     {
+    private CustomLocationListener( Context c )     {
 
         initLocationService(c);
         context = c;
-        LogService.log("LocationService created");
+        LogService.log("CustomLocationListener created");
     }
 
     /**
@@ -165,8 +166,9 @@ public class LocationService implements LocationListener  {
             if ( calculateSpeed > maxCalculatedSpeed ) {
                 maxCalculatedSpeed = calculateSpeed;
             }
+            EventBus.getDefault().post( locationState );
         } catch ( Exception ex ) {
-            LogService.log( "Error performing LocationService calculation: " + ex.getMessage() );
+            LogService.log( "Error performing CustomLocationListener calculation: " + ex.getMessage() );
         }
     }
 
@@ -181,26 +183,11 @@ public class LocationService implements LocationListener  {
         this.previousLocation = this.location;
         this.location = newLocation;
         updateCoordinates();
-        calculateSpeed(newLocation );
-        sendData();
+        calculateSpeed( newLocation );
 
         Intent broadcast = new Intent();
         broadcast.setAction( BROADCAST_ACTION );
         context.sendBroadcast( broadcast );
-    }
-
-    /**
-     * Packages and sends data to the server
-     */
-    private void sendData() {
-
-//        HTTPRestTask task = new HTTPRestTask( this.context, RequestType.POST );
-//        task.setURL( context.getString( R.string.SERVER ) + "addlocationdata" );
-//        task.addHeaderParam( "X-API-KEY", context.getString( R.string.ApiKey ));
-//        task.addBodyParam( "latitude", this.latitude );
-//        task.addBodyParam( "longitude", this.longitude );
-//        task.addBodyParam( "speed", String.format("%.4f", (speed * 3.6)));
-//        task.execute(  );
     }
 
     @Override
@@ -239,5 +226,7 @@ public class LocationService implements LocationListener  {
     public boolean isGPSEnabled() {
         return isGPSEnabled;
     }
+
+
 
 }

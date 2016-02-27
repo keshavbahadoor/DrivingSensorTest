@@ -12,23 +12,28 @@
     <!-- To use account credentials -->
     <uses-permission android:name="android.permission.USE_CREDENTIALS" />
 
+    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED"/>
+    <uses-permission android:name="android.permission.WAKE_LOCK"/>
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
 
+
+
     <application
-
-
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
         android:supportsRtl="true"
         android:theme="@style/AppTheme" >
 
+        <receiver android:name="keshav.com.drivingeventlib.SyncScheduler" android:process=":remote"/>
+
         <meta-data
             android:name="com.google.android.gms.version"
             android:value="@integer/google_play_services_version" />
 
-        <service android:enabled="true" android:name="sensor.lib.SensorService"></service>
-        <service android:name="keshav.com.drivingeventlib.DrivingPatternService" android:enabled="true"></service>
+        <service android:enabled="true" android:name="sensor.lib.SensorService"/>
+        <service android:name="keshav.com.drivingeventlib.DrivingPatternService" android:enabled="true"/>
+        <service android:name="keshav.com.drivingeventlib.DataCacheService" android:enabled="true" />
 
         <activity
             android:name=".MainActivity"

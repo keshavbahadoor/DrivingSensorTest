@@ -13,7 +13,7 @@ import android.widget.TextView;
 
 import com.driving.senor.test.R;
 import sensor.lib.LocationEnum;
-import sensor.lib.LocationService;
+import sensor.lib.CustomLocationListener;
 import keshav.com.utilitylib.LogService;
 
 /**
@@ -21,7 +21,7 @@ import keshav.com.utilitylib.LogService;
  */
 public class LocationFragment extends android.support.v4.app.Fragment implements View.OnClickListener {
 
-    private LocationService locationService;
+    private CustomLocationListener customLocationListener;
     private View fragment;
     private Context context;
     TextView location, onFoot, inVehicle;
@@ -52,7 +52,7 @@ public class LocationFragment extends android.support.v4.app.Fragment implements
         inVehicle = (TextView) fragment.findViewById( R.id.tv_invehicle );
         location = (TextView) fragment.findViewById( R.id.tv_locationdata );
 
-        context.registerReceiver( locationReceiver, new IntentFilter( LocationService.BROADCAST_ACTION ) );
+        context.registerReceiver( locationReceiver, new IntentFilter( CustomLocationListener.BROADCAST_ACTION ) );
 
         return fragment;
     }
@@ -62,14 +62,14 @@ public class LocationFragment extends android.support.v4.app.Fragment implements
         super.onStart();
         // This is needed here to avoid the error:
         // Attempt to invoke virtual method 'java.lang.Object android.content.Context.getSystemService(java.lang.String)' on a null object reference
-        locationService = LocationService.getLocationManager( context );
+        customLocationListener = CustomLocationListener.getLocationManager( context );
     }
 
 
     @Override
     public void onClick( View v ) {
         if (v.getId() == R.id.btn_getLocation ) {
-            Log.d( "LOCATION", "Latitude : " + locationService.getLatitude() + " Longitude : " + locationService.getLongitude() );
+            Log.d( "LOCATION", "Latitude : " + customLocationListener.getLatitude() + " Longitude : " + customLocationListener.getLongitude() );
             setLocationResults();
         }
     }
@@ -77,12 +77,12 @@ public class LocationFragment extends android.support.v4.app.Fragment implements
     private void setLocationResults()
     {
         location.setText( "" );
-        location.append( "LAT : " + locationService.getLatitude() + "\n" );
-        location.append( "LONG : " + locationService.getLongitude() + "\n" );
-        location.append( "Speed: " + String.format( "%.4f", ( locationService.speed * 3.6 ) ) + "\n" );
-        location.append( "Max Speed: " + String.format( "%.4f", ( locationService.maxSpeed * 3.6 ) ) + "\n" );
+        location.append( "LAT : " + customLocationListener.getLatitude() + "\n" );
+        location.append( "LONG : " + customLocationListener.getLongitude() + "\n" );
+        location.append( "Speed: " + String.format( "%.4f", ( customLocationListener.speed * 3.6 ) ) + "\n" );
+        location.append( "Max Speed: " + String.format( "%.4f", ( customLocationListener.maxSpeed * 3.6 ) ) + "\n" );
 
-        if (locationService.locationState == LocationEnum.IN_VEHICLE ) {
+        if ( customLocationListener.locationState == LocationEnum.IN_VEHICLE ) {
             inVehicle.setVisibility( View.VISIBLE );
             onFoot.setVisibility( View.GONE );
         }
@@ -95,7 +95,7 @@ public class LocationFragment extends android.support.v4.app.Fragment implements
     @Override
     public void onStop() {
         super.onStop();
-        context.stopService( new Intent( context, LocationService.class ) );
+        context.stopService( new Intent( context, CustomLocationListener.class ) );
         try {
             context.unregisterReceiver( locationReceiver );
         }

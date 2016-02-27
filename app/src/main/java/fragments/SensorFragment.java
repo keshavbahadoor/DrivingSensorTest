@@ -173,7 +173,6 @@ public class SensorFragment extends android.support.v4.app.Fragment implements V
     @Subscribe
     public void onMessageEvent( AccelerationDataMessage message ) {
 
-        LogService.log( "Received a message" );
         ( (TextView) fragment.findViewById( R.id.value_acc_X ) ).setText( "X: " + message.sensorVals[0] );
         ( (TextView) fragment.findViewById( R.id.value_acc_Y ) ).setText( "Y: " + message.sensorVals[1] );
         ( (TextView) fragment.findViewById( R.id.value_acc_Z ) ).setText( "Z: " + message.sensorVals[2] );
