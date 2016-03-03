@@ -1,7 +1,6 @@
 package fragments;
 
 import android.content.BroadcastReceiver;
-import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
@@ -14,8 +13,8 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import MessageEvents.AccelerationDataMessage;
-import keshav.com.drivingeventlib.DrivingPatternService;
-import sensor.lib.SensorService;
+import services.DrivingPatternService;
+import services.SensorService;
 import com.driving.senor.test.R;
 
 import org.greenrobot.eventbus.EventBus;
@@ -148,7 +147,7 @@ public class SensorFragment extends android.support.v4.app.Fragment implements V
         if (v.getId() == R.id.fBtn_actionbutton) {
             if ( !ServiceUtil.isServiceRunning( SensorService.class, context )) {
                 // context.startService( new Intent( context, SensorService.class ) );
-                context.startService( new Intent(context, DrivingPatternService.class) );
+                //context.startService( new Intent(context, DrivingPatternService.class) );
             }
             else {
                 Snackbar.make( v, "Sensor Service already running", Snackbar.LENGTH_LONG ).show();

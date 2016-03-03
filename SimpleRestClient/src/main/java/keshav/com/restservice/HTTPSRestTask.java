@@ -95,7 +95,7 @@ public class HTTPSRestTask extends AbstractRestTask {
 
     @Override
     protected void onPostExecute(String result) {
-
+        super.onPostExecute( result );
         Log.d( TAG, "Request fired. Result: " + result );
     }
 }

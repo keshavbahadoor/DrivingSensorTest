@@ -29,6 +29,7 @@ public abstract class AbstractRestTask extends AsyncTask<String, String, String>
     protected Context context;
     protected RequestType requestType;
     protected int requestProtocol = HTTP;
+    protected String currentResponse = "";
 
     // auth stuff
     protected String basicAuthCredentials =   "" ;
@@ -38,6 +39,7 @@ public abstract class AbstractRestTask extends AsyncTask<String, String, String>
     protected List<String> headerParamKeys;
     protected List<String> headerParamValues;
     protected ContentValues bodyParams;
+    protected OnTaskComplete listener;
 
     /**
      * Constructor
@@ -54,6 +56,16 @@ public abstract class AbstractRestTask extends AsyncTask<String, String, String>
         this.requestType = type;
     }
 
+    /**
+     * Constructor
+     * @param context
+     * @param type
+     * @param listener ontaskcomplete implementation. This allows a callback functionality
+     */
+    public AbstractRestTask (Context context, RequestType type, OnTaskComplete listener) {
+        this (context, type);
+        this.listener = listener;
+    }
 
     /**
      * Adds basic HTTP authorization
@@ -84,6 +96,14 @@ public abstract class AbstractRestTask extends AsyncTask<String, String, String>
             result.append( URLEncoder.encode( entry.getValue().toString(), "UTF-8" ));
         }
         return result.toString();
+    }
+
+    @Override
+    protected void onPostExecute( String s ) {
+        super.onPostExecute( s );
+        if (listener != null) {
+            listener.onTaskCompleted( s );
+        }
     }
 
     /**
@@ -132,4 +152,9 @@ public abstract class AbstractRestTask extends AsyncTask<String, String, String>
     public void setRequestProtocol( int requestProtocol ) {
         this.requestProtocol = requestProtocol;
     }
+
+    public String getResponse() {
+        return currentResponse;
+    }
+
 }

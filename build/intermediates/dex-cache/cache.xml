@@ -5,7 +5,7 @@
         jar="C:\SRC\android\DrivingSensorTest\app\build\intermediates\exploded-aar\DrivingSensorTest\DrivingEventLib\unspecified\jars\classes.jar"
         jumboMode="false"
         revision="23.0.2"
-        sha1="62e7972f7ac6f12cf1b8ea119ae7463e63e91b88">
+        sha1="47862af754ceb9e21c66307af3594f73ac0acabd">
         <dex dex="C:\SRC\android\DrivingSensorTest\app\build\intermediates\pre-dexed\debug\DrivingSensorTest-DrivingEventLib-unspecified_e9a66c04ae8523325b09b5856138342bc0bc2034.jar" />
     </item>
 

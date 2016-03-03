@@ -16,8 +16,9 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.Toast;
 
-import keshav.com.drivingeventlib.DataCacheService;
-import sensor.lib.SensorService;
+import services.DataCacheService;
+import services.DrivingService;
+import services.SensorService;
 import sensor.lib.CustomLocationListener;
 import user.management.GooglePlusHandler;
 import keshav.com.utilitylib.DialogFactory;
@@ -75,14 +76,16 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
         if (! googlePlusHandler.isSignedIn()) {
             signInDialog.show();
+        } else {
+            this.startService( new Intent( this.getApplicationContext(), DrivingService.class ) );
         }
     }
 
     @Override
     protected void onStop() {
         super.onStop();
-        stopService( new Intent( this, SensorService.class ) );
-        stopService( new Intent( this, CustomLocationListener.class ) );
+//        stopService( new Intent( this, SensorService.class ) );
+//        stopService( new Intent( this, CustomLocationListener.class ) );
     }
 
     @Override
@@ -132,7 +135,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             editor.putString( "AccountID", data.googleID );
             editor.commit();
 
-            this.startService( new Intent( this.getApplicationContext(), DataCacheService.class ) );
+
         }
     }
 }

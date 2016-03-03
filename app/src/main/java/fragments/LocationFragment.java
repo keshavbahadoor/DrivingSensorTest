@@ -62,15 +62,15 @@ public class LocationFragment extends android.support.v4.app.Fragment implements
         super.onStart();
         // This is needed here to avoid the error:
         // Attempt to invoke virtual method 'java.lang.Object android.content.Context.getSystemService(java.lang.String)' on a null object reference
-        customLocationListener = CustomLocationListener.getLocationManager( context );
+        //customLocationListener = CustomLocationListener.getLocationManager( context );
     }
 
 
     @Override
     public void onClick( View v ) {
         if (v.getId() == R.id.btn_getLocation ) {
-            Log.d( "LOCATION", "Latitude : " + customLocationListener.getLatitude() + " Longitude : " + customLocationListener.getLongitude() );
-            setLocationResults();
+            //Log.d( "LOCATION", "Latitude : " + customLocationListener.getLatitude() + " Longitude : " + customLocationListener.getLongitude() );
+            //setLocationResults();
         }
     }
 

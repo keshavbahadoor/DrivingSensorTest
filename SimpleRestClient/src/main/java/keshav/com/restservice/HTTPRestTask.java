@@ -14,12 +14,15 @@ import java.net.URL;
  */
 public class HTTPRestTask extends AbstractRestTask {
 
+
+
     public HTTPRestTask( Context context ) {
         super( context );
     }
     public HTTPRestTask( Context context, RequestType type ) {
         super( context, type );
     }
+    public HTTPRestTask( Context context, RequestType type, OnTaskComplete listener) { super (context, type, listener); }
 
     /**
      * Builds the HTTP request given the supplied data then attempts to send request
@@ -64,8 +67,8 @@ public class HTTPRestTask extends AbstractRestTask {
                 writer.close();
                 os.close();
             }
-            connection.connect();
 
+            connection.connect();
             int responseCode = connection.getResponseCode();
             Log.d( TAG, "Response code: " + responseCode );
             if (responseCode == HttpURLConnection.HTTP_OK ||
@@ -84,13 +87,16 @@ public class HTTPRestTask extends AbstractRestTask {
             e.printStackTrace();
         }
         Log.d( TAG, response );
+        currentResponse = response;
         return response;
     }
 
     @Override
     protected void onPostExecute(String result) {
+        super.onPostExecute( result );
         Log.d( TAG, "Request fired. Result: " + result );
     }
+
 
 
 }

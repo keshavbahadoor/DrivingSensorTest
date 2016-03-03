@@ -91,7 +91,7 @@ public class GooglePlusHandler implements GoogleApiClient.OnConnectionFailedList
         try {
             SharedPreferences.Editor editor = context.getSharedPreferences( GOOGLE_SIGN_IN_STORE, Context.MODE_PRIVATE ).edit();
             editor.putBoolean( SIGNED_IN_PREFERENCE, signedInState );
-            editor.commit();
+            editor.apply();
         } catch (Exception ex) {
             // do something
         }
@@ -106,6 +106,7 @@ public class GooglePlusHandler implements GoogleApiClient.OnConnectionFailedList
                 signInIntent = Auth.GoogleSignInApi.getSignInIntent( googleApiClient );
                 mainActivity.startActivityForResult( signInIntent, RC_SIGN_IN );
                 progressDialog.show();
+                setSignedIn( true );
                 return true;
             } else {
                 LogService.log( "WARNING: google api client is not connected" );
