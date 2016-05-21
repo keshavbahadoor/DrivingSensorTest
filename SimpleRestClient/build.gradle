@@ -2,7 +2,7 @@ apply plugin: 'com.android.library'
 
 android {
     compileSdkVersion 23
-    buildToolsVersion "23.0.2"
+    buildToolsVersion "23.0.3"
 
     defaultConfig {
         minSdkVersion 15
@@ -24,3 +24,64 @@ dependencies {
     compile 'com.android.support:appcompat-v7:23.1.1'
     compile 'org.greenrobot:eventbus:3.0.0'
 }
+
+version = '1.0'
+//
+//apply plugin: 'com.jfrog.bintray'
+//apply plugin: 'com.github.dcendents.android-maven'
+//
+//
+//
+//bintray {
+//    // Bintray username
+//    user = 'keshavbahadoor'
+//
+//    // Bintray key
+//    key = '846bd3cd59a0b1a1921ab106605377dabc95f844'
+//    pkg {
+//        repo = 'maven'
+//
+//        // Name of the project on bintray
+//        name = 'simple-rest-client'
+//
+//        // should match the license you created on bintray
+//        licenses = ['Apache-2.0']
+//
+//        // Github urls of the project
+//        vcsUrl = 'https://github.com/keshavbahadoor/DrivingSensorTest.git'
+//        websiteUrl = 'https://github.com/keshavbahadoor/DrivingSensorTest'
+//
+//        version {
+//            name = 'android-util-pak'
+//            desc = 'Utils'
+//            released  = new Date()
+//            vcsTag = '1.0'
+//        }
+//    }
+//    configurations = ['archives']
+//}
+//
+//task generateSourcesJarRC(type: Jar) {
+//    from android.sourceSets.main.java.srcDirs
+//    classifier 'sources'
+//}
+//
+//task generateJavadocsRC(type: Javadoc) {
+//
+//    source = android.sourceSets.main.java.srcDirs
+//    classpath += project.files(android.getBootClasspath().join(File.pathSeparator))
+//    failOnError false
+//}
+//
+//task generateJavadocsJarRC(type: Jar) {
+//    from generateJavadocsRC.destinationDir
+//    classifier 'javadoc'
+//}
+//
+//
+//generateJavadocsJarRC.dependsOn generateJavadocsRC
+//
+//artifacts {
+//    archives generateJavadocsJarRC
+//    archives generateSourcesJarRC
+//}

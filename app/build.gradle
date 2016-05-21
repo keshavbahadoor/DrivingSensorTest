@@ -2,7 +2,7 @@ apply plugin: 'com.android.application'
 
 android {
     compileSdkVersion 23
-    buildToolsVersion "23.0.2"
+    buildToolsVersion "23.0.3"
 
     defaultConfig {
         applicationId "com.driving.senor.test"
@@ -19,6 +19,12 @@ android {
     }
 }
 
+repositories {
+    maven {
+        url 'https://dl.bintray.com/keshavbahadoor/maven'
+    }
+}
+
 dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
     testCompile 'junit:junit:4.12'
@@ -27,9 +33,49 @@ dependencies {
     compile 'com.android.support:support-v4:23.1.1'
     compile 'com.google.android.gms:play-services:8.4.0'
     compile 'org.greenrobot:eventbus:3.0.0'
-    compile project(':SimpleRestClient')
-    compile project(':DrivingEventLib')
-    compile project(':UtilityLib')
+    //compile project(':SimpleRestClient')
+    //compile project(':DrivingEventLib')
+    //compile project(':UtilityLib')
+    compile 'DrivingSensorTest:SimpleRestClient:1.0'
+    compile 'DrivingSensorTest:DrivingEventLib:1.0'
+    compile 'DrivingSensorTest:UtilityLib:unspecified'
 }
 
 apply plugin: 'com.google.gms.google-services'
+
+
+
+allprojects {
+    tasks.withType(Javadoc) {
+        options.addStringOption('Xdoclint:none', '-quiet')
+        options.addStringOption('encoding', 'UTF-8')
+    }
+}
+
+/**
+ * Disables the JavaDocs generation during Bintray upload.
+ * This is required as errors occurs during upload.
+ * @param path
+ * @return
+ */
+def disableJavaDocsGenerationForBintrayUploadIfExist(path) {
+    if (tasks.findByPath(path) != null) {
+        tasks.findByPath(path).enabled = false
+    }
+}
+
+disableJavaDocsGenerationForBintrayUploadIfExist(":UtilityLib:generateJavadocs")
+disableJavaDocsGenerationForBintrayUploadIfExist(":SimpleRestClient:generateJavadocsRC")
+disableJavaDocsGenerationForBintrayUploadIfExist(":DrivingEventLib:generateJavadocsDEL")
+
+//if (tasks.findByPath(":UtilityLib:generateJavadocs") != null) {
+//    tasks.findByPath(":UtilityLib:generateJavadocs").enabled = false
+//}
+//if (tasks.findByPath(":SimpleRestClient:generateJavadocsRC") != null) {
+//    tasks.findByPath(":SimpleRestClient:generateJavadocsRC").enabled = false
+//}
+
+
+//tasks.findByPath(":UtilityLib:generateJavadocs").enabled = false
+//tasks.findByPath(":SimpleRestClient:generateJavadocsRC").enabled = false
+//tasks.findByPath(":DrivingEventLib:generateJavadocsDEL").enabled = false

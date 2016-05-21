@@ -1,8 +1,10 @@
 apply plugin: 'com.android.library'
 
+version = '1.0'
+
 android {
     compileSdkVersion 23
-    buildToolsVersion "23.0.2"
+    buildToolsVersion "23.0.3"
 
     defaultConfig {
         minSdkVersion 15
@@ -25,3 +27,62 @@ dependencies {
     compile 'com.android.support:support-v4:23.1.1'
     compile 'com.android.support:design:23.1.1'
 }
+
+
+//apply plugin: 'com.jfrog.bintray'
+//apply plugin: 'com.github.dcendents.android-maven'
+//
+//
+//bintray {
+//
+//    // Bintray username
+//    user = 'keshavbahadoor'
+//
+//    // Bintray key
+//    key = '846bd3cd59a0b1a1921ab106605377dabc95f844'
+//    pkg {
+//        repo = 'maven'
+//
+//        // Name of the project on bintray
+//        name = 'android-util-pak'
+//
+//        version {
+//            name = 'android-util-pak'
+//            desc = 'Utils'
+//            released  = new Date()
+//            vcsTag = '1.0'
+//        }
+//
+//        licenses = ['Apache-2.0']
+//
+//        // Github urls of the project
+//        vcsUrl = 'https://github.com/keshavbahadoor/DrivingSensorTest.git'
+//        websiteUrl = 'https://github.com/keshavbahadoor/DrivingSensorTest'
+//    }
+//    configurations = ['archives']
+//}
+//
+//task generateSourcesJar(type: Jar) {
+//    from android.sourceSets.main.java.srcDirs
+//    classifier 'sources'
+//}
+//
+//task generateJavadocs(type: Javadoc) {
+//
+//    source = android.sourceSets.main.java.srcDirs
+//    classpath += project.files(android.getBootClasspath().join(File.pathSeparator))
+//    failOnError false
+//}
+//
+//task generateJavadocsJar(type: Jar) {
+//    from generateJavadocs.destinationDir
+//    classifier 'javadoc'
+//}
+//
+//
+//generateJavadocsJar.dependsOn generateJavadocs
+//
+//artifacts {
+//    archives generateJavadocsJar
+//    archives generateSourcesJar
+//}

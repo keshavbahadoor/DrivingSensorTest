@@ -5,17 +5,17 @@ package MessageEvents;
  */
 public class GPSDataMessage  {
 
-    public String latitude;
-    public String longitude;
+    public double latitude;
+    public double longitude;
     public float speed;
 
     public GPSDataMessage() {
-        latitude = "";
-        longitude = "";
+        latitude = 0.0;
+        longitude = 0.0;
         speed = 0F;
     }
 
-    public void updateData(String latitude, String longitude, float speed) {
+    public void updateData(double latitude, double longitude, float speed) {
         this.latitude = latitude;
         this.longitude = longitude;
         this.speed = speed;

@@ -1,7 +1,9 @@
 package sensor.lib;
 
 import android.annotation.TargetApi;
+import android.app.usage.UsageEvents;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.location.Location;
@@ -10,10 +12,15 @@ import android.location.LocationManager;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.content.ContextCompat;
+import android.support.v4.content.LocalBroadcastManager;
+import android.support.v7.app.AlertDialog;
 
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 
+import MessageEvents.GPSDataMessage;
+import datalayer.LocalStorage;
+import keshav.com.drivingeventlib.GLOBALS;
 import keshav.com.utilitylib.LogService;
 
 import java.util.Calendar;
@@ -36,7 +43,7 @@ public class CustomLocationListener implements LocationListener  {
     private static final long MIN_DISTANCE_CHANGE_FOR_UPDATES = 10; // 10 meters
 
     //The minimum time between updates in milliseconds
-    private static final long MIN_TIME_BW_UPDATES = 30000;//1000 * 60 * 1; // 1 minute
+    private static final long MIN_TIME_BW_UPDATES = 1000;//1000 * 60 * 1; // 1 minute
 
     private final static boolean forceNetwork = false;
 
@@ -53,6 +60,7 @@ public class CustomLocationListener implements LocationListener  {
     private boolean isNetworkEnabled;
     private boolean locationServiceAvailable;
     public LocationEnum locationState;
+    public GPSDataMessage dataMessage;
 
     public float speed = 0.0F;
     public float maxSpeed = 0.0F;
@@ -77,7 +85,12 @@ public class CustomLocationListener implements LocationListener  {
     private CustomLocationListener( Context c )     {
 
         initLocationService(c);
+        dataMessage = new GPSDataMessage();
         context = c;
+//        if ( !EventBus.getDefault().isRegistered( this ) ) {
+//            EventBus.getDefault().register( this );
+//        }
+//        EventBus.getDefault().register( this );
         LogService.log("CustomLocationListener created");
     }
 
@@ -137,6 +150,10 @@ public class CustomLocationListener implements LocationListener  {
                     locationState = LocationEnum.STATIONARY;
                 }
             }
+//            else {
+//                buildAlertMessageNoGps();
+//                initLocationService( context );
+//            }
         } catch (Exception ex)  {
             LogService.log( "Error creating location service: " + ex.getMessage() );
         }
@@ -144,7 +161,6 @@ public class CustomLocationListener implements LocationListener  {
 
     /**
      * Calculates and saves speed
-     * @return
      */
     private void calculateSpeed(Location location) {
         speed = location.getSpeed();
@@ -166,28 +182,78 @@ public class CustomLocationListener implements LocationListener  {
             if ( calculateSpeed > maxCalculatedSpeed ) {
                 maxCalculatedSpeed = calculateSpeed;
             }
-            EventBus.getDefault().post( locationState );
         } catch ( Exception ex ) {
             LogService.log( "Error performing CustomLocationListener calculation: " + ex.getMessage() );
         }
     }
 
-
+    /**
+     * Updates the local coorindate variables
+     */
     private void updateCoordinates()     {
         this.latitude = location.getLatitude();
         this.longitude = location.getLongitude();
     }
 
+    /**
+     * sets previous location, updates coordinates, calculates speed, and sends broadcast
+     * @param newLocation
+     */
     @Override
     public void onLocationChanged(Location newLocation)     {
         this.previousLocation = this.location;
         this.location = newLocation;
         updateCoordinates();
         calculateSpeed( newLocation );
+        dataMessage.updateData( latitude, longitude, speed );
 
-        Intent broadcast = new Intent();
-        broadcast.setAction( BROADCAST_ACTION );
-        context.sendBroadcast( broadcast );
+        Intent intent = new Intent(BROADCAST_ACTION);
+        intent.putExtra( "latitude", latitude );
+        intent.putExtra( "longitude", longitude );
+        intent.putExtra( "speed", speed );
+        LocalBroadcastManager.getInstance( context ).sendBroadcast( intent );
+
+        // Send events
+//        EventBus.getDefault().postSticky( dataMessage );
+
+//        if ( GLOBALS.DEBUG_ALWAYS_IN_VEHICLE ) {
+//            EventBus.getDefault().post( LocationEnum.IN_VEHICLE );
+//        } else {
+//            EventBus.getDefault().post( locationState );
+//        }
+        LogService.log( "LOCATION CHANGED" );
+    }
+
+
+
+    /**
+     * Tears down the object
+     *  - removes the object from the EventBus
+     */
+    public void destroy() {
+        //EventBus.getDefault().unregister( this );
+    }
+
+    /**
+     * Creates a prompt for the user to enable GPS
+     */
+    private void buildAlertMessageNoGps() {
+        final AlertDialog.Builder builder = new AlertDialog.Builder(this.context);
+        builder.setMessage("Your GPS seems to be disabled, do you want to enable it to proceed?")
+                .setCancelable(false)
+                .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                    public void onClick(final DialogInterface dialog,  final int id) {
+                        context.startActivity(new Intent(android.provider.Settings.ACTION_LOCATION_SOURCE_SETTINGS));
+                    }
+                })
+                .setNegativeButton("No", new DialogInterface.OnClickListener() {
+                    public void onClick(final DialogInterface dialog, final int id) {
+                        dialog.cancel();
+                    }
+                });
+        final AlertDialog alert = builder.create();
+        alert.show();
+
     }
 
     @Override
