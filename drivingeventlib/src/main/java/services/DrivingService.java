@@ -32,24 +32,7 @@ import weather.WeatherDataUtil;
  * MAIN BACKGROUND SERVICE
  * Created by Keshav on 3/1/2016.
  */
-public class DrivingService extends Service implements SensorEventListener, OnTaskComplete {
-
-    /**
-     * The time inbetween action to be done on accelerometer values
-     */
-    private static final long TIME_INTERVAL_ACCELEROMETER = 4000L;
-
-    /**
-     * The time in between action to be done on gps data
-     */
-    private static final long TIME_INTERVAL_GPS_DATA = 2000L;
-    /**
-     * The time inbetween to check for weather updates. This is in hours
-     */
-    private static final int WEATHER_UPDATE_TIME_INTERVAL_HOURS = 2;
-
-    private long prevTime = 0L;
-    private long prevTimeGPS = 0L;
+public class DrivingService extends Service implements SensorEventListener  {
 
     /**
      * Google Identifier for the currently logged in user. Required for server use.
@@ -58,22 +41,26 @@ public class DrivingService extends Service implements SensorEventListener, OnTa
     private SensorManager sensorManager;
     private Sensor accelerometerSensor;
     private CustomLocationListener customLocationListener;
-    private LocalStorage localStorage;
     private LocationEnum locationState;
     private AccelerometerDataTaskDelegator accelerometerDataTaskDelegator;
+    private LocationDataTaskDelegator locationDataTaskDelegator;
 
     /**
      * This is called when location data is changed.
+     * Origin: CustomLocationListener
      */
     private BroadcastReceiver gpsDataReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive( Context context, Intent intent ) {
             LogService.log( "GPS broadcast receiver called" );
             locationState = customLocationListener.locationState;
-            handleGPSData(  intent.getDoubleExtra( "latitude", 0 ),
-                    intent.getDoubleExtra( "longitude", 0 ),
-                    intent.getFloatExtra( "speed", 0F )
-            );
+
+            // handle location data
+            locationDataTaskDelegator.handleTask( intent );
+
+            // Update location state to all
+            accelerometerDataTaskDelegator.updateLocationState( locationState );
+            locationDataTaskDelegator.updateLocationState( locationState );
         }
     };
 
@@ -88,6 +75,7 @@ public class DrivingService extends Service implements SensorEventListener, OnTa
 
         // init Task Handlers
         accelerometerDataTaskDelegator = new AccelerometerDataTaskDelegator( this.getApplicationContext() );
+        locationDataTaskDelegator = new LocationDataTaskDelegator( this.getApplicationContext() );
 
         // init sensor related vars
         sensorManager = (SensorManager) this.getApplicationContext().getSystemService( Context.SENSOR_SERVICE );
@@ -95,9 +83,6 @@ public class DrivingService extends Service implements SensorEventListener, OnTa
         sensorManager.registerListener( this, accelerometerSensor, SensorManager.SENSOR_DELAY_NORMAL );
 
         // init location related vars
-        localStorage = LocalStorage.getInstance( this.getApplicationContext() );
-        prevTime = System.currentTimeMillis();
-        prevTimeGPS = System.currentTimeMillis();
         locationState = LocationEnum.STATIONARY;
 
         // get google ID from stored prefs
@@ -149,7 +134,8 @@ public class DrivingService extends Service implements SensorEventListener, OnTa
 
     /**
      * Fires each time the sensor value changes.
-     * Only handle the data if we are currently in a moving vehicle
+     * Only handle the data if we are currently in a moving vehicle.
+     * We delegate the accelerometer tasks to a handler. 
      * @param event
      */
     @Override
@@ -164,72 +150,10 @@ public class DrivingService extends Service implements SensorEventListener, OnTa
         }
     }
 
-    /**---------------------------------------------------------------------------------------------------------------------
-     * Handles the received accelerometer data values
-     * - if we are in the vehicle and adequate time has elapsed, then we send the data
-     *      to the server depending on network connection.
-     *      If no network connectivity, then we store data locally instead.
-     * @param vals Current raw accelerometer data
-     *--------------------------------------------------------------------------------------------------------------------*/
-    public void handleAccelerometerData( float[] vals ) {
-
-        if (  (System.currentTimeMillis() - prevTime) > TIME_INTERVAL_ACCELEROMETER ) {
-
-            LogService.log( "Proceeding to capture / store acceleration data. " );
-            if ( NetworkUtil.isNetworkAvailable( this.getApplicationContext() ) ) {
-                ServerRequests.postAccelerationData( this.getApplicationContext(),
-                        googleID, vals[0], vals[1], vals[2] );
-            } else {
-                localStorage.addSensorData( vals[0], vals[1], vals[2] );
-            }
-            prevTime = System.currentTimeMillis();
-        }
-    }
-
-    /**---------------------------------------------------------------------------------------------------------------------
-     * Handles the passed GPS data
-     * @param latitude current location lat
-     * @param longitude current location lon
-     * @param speed current speed of the vehicle
-     *--------------------------------------------------------------------------------------------------------------------*/
-    public void handleGPSData( double latitude, double longitude, float speed ) {
-
-        // Update Weather data using received GPS data
-        // Note that weather data is only updated every 2 hours
-       WeatherDataUtil.updateWeatherDataIfOutdated( getApplicationContext(), this, latitude, longitude, -WEATHER_UPDATE_TIME_INTERVAL_HOURS );
-
-        if ( locationState == LocationEnum.IN_VEHICLE &&
-                (System.currentTimeMillis() - prevTimeGPS) > TIME_INTERVAL_GPS_DATA) {
-
-            LogService.log( "Proceeding to capture / store GPS data. " );
-
-            if ( NetworkUtil.isNetworkAvailable( this.getApplicationContext() ) ) {
-
-                WeatherData data = StoredPrefsHandler.retrieveWeatherData( getApplicationContext() );
-
-                ServerRequests.postGPSData( this.getApplicationContext(),
-                        googleID, "" + latitude, "" + longitude, speed,
-                        data.weatherID, data.rainVolume, data.temperature, data.windSpeed,
-                        data.pressure, data.humidity
-                );
-            } else {
-                // store data locally
-                localStorage.addGPSData( "" + latitude, "" + longitude, speed );
-            }
-            prevTimeGPS = System.currentTimeMillis();
-        }
-    }
 
 
-    /**
-     * Rest server task completed callback
-     * @param result
-     */
-    @Override
-    public void onTaskCompleted( String result ) {
-        LogService.log( "on Task complete callback called" );
-        StoredPrefsHandler.storeWeatherData( this.getApplicationContext(), WeatherDataUtil.parseJson( result ) );
-    }
+
+
 
     @Nullable
     @Override

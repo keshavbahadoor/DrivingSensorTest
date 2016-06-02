@@ -26,6 +26,7 @@ dependencies {
     compile project(':SimpleRestClient')
     // compile project(':UtilityLib')
     compile 'DrivingSensorTest:UtilityLib:unspecified'
+    compile 'com.google.android.gms:play-services-location:9.0.1'
 }
 
 version = '1.0'
