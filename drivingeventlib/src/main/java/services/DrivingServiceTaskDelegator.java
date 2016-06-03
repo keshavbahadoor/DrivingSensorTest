@@ -6,7 +6,7 @@ import android.hardware.SensorEvent;
 
 import datalayer.LocalStorage;
 import datalayer.StoredPrefsHandler;
-import sensor.lib.LocationEnum;
+import location.LocationEnum;
 import system.TaskDelegator;
 
 /**

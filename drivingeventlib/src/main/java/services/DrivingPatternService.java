@@ -18,8 +18,8 @@ import MessageEvents.AccelerationDataMessage;
 import MessageEvents.GPSDataMessage;
 import MessageEvents.GyroDataMessage;
 import keshav.com.utilitylib.LogService;
-import sensor.lib.CustomLocationListener;
-import sensor.lib.LocationEnum;
+import location.CustomLocationListener;
+import location.LocationEnum;
 import sensor.lib.SensorEnum;
 import sensor.lib.SensorFilter;
 

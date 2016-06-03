@@ -12,21 +12,12 @@ import android.hardware.SensorManager;
 import android.os.IBinder;
 import android.support.annotation.Nullable;
 import android.support.v4.content.LocalBroadcastManager;
-import android.util.Log;
 import android.widget.Toast;
-import MessageEvents.AccelerationDataMessage;
-import datalayer.LocalStorage;
+
 import datalayer.StoredPrefsHandler;
-import keshav.com.drivingeventlib.ServerRequests;
-import keshav.com.restservice.OnTaskComplete;
-import keshav.com.utilitylib.DateUtil;
 import keshav.com.utilitylib.LogService;
-import keshav.com.utilitylib.NetworkUtil;
-import sensor.lib.CustomLocationListener;
-import sensor.lib.LocationEnum;
-import sensor.lib.SensorFilter;
-import weather.WeatherData;
-import weather.WeatherDataUtil;
+import location.CustomLocationListener;
+import location.LocationEnum;
 
 /**
  * MAIN BACKGROUND SERVICE

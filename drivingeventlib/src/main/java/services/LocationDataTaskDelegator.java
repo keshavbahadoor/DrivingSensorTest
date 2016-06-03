@@ -9,7 +9,7 @@ import keshav.com.drivingeventlib.ServerRequests;
 import keshav.com.restservice.OnTaskComplete;
 import keshav.com.utilitylib.LogService;
 import keshav.com.utilitylib.NetworkUtil;
-import sensor.lib.LocationEnum;
+import location.LocationEnum;
 import weather.WeatherData;
 import weather.WeatherDataUtil;
 

@@ -54,6 +54,7 @@ public class CustomLocationListener implements LocationListener  {
     private boolean isNetworkEnabled;
     private boolean locationServiceAvailable;
     public LocationEnum locationState;
+    public LocationEnum previousLocationState;
     public GPSDataMessage dataMessage;
 
     public float speed = 0.0F;
@@ -78,9 +79,9 @@ public class CustomLocationListener implements LocationListener  {
      */
     private CustomLocationListener( Context c )     {
 
-        initLocationService(c);
-        dataMessage = new GPSDataMessage();
         context = c;
+        initLocationService(LocationUpdateDistance.AGGRESSIVE, LocationUpdateTime.AGGRESSIVE);
+        dataMessage = new GPSDataMessage();
         LogService.log("CustomLocationListener created");
     }
 
@@ -88,7 +89,7 @@ public class CustomLocationListener implements LocationListener  {
      * Sets up location service after permissions is granted
      */
     @TargetApi(23)
-    private void initLocationService(Context context) {
+    private void initLocationService(long minUpdateDistance, long minUpdateTime) {
 
         try   {
             longitude = 0.0;
@@ -111,12 +112,13 @@ public class CustomLocationListener implements LocationListener  {
                     this.locationServiceAvailable = true;
 
                     if (isNetworkEnabled) {
-                        initiateLocationUpdates( LocationManager.NETWORK_PROVIDER );
+                        initiateLocationUpdates( LocationManager.NETWORK_PROVIDER, minUpdateDistance, minUpdateTime);
                     }
                     if (isGPSEnabled)  {
-                        initiateLocationUpdates( LocationManager.GPS_PROVIDER );
+                        initiateLocationUpdates( LocationManager.GPS_PROVIDER, minUpdateDistance, minUpdateTime );
                     }
                     locationState = LocationEnum.STATIONARY;
+                    previousLocationState = locationState;
                 }
             }
 //            else {
@@ -136,7 +138,7 @@ public class CustomLocationListener implements LocationListener  {
      * in order for location manager operations to be allowed.
      * @param locationProvider can be either gps or network based
      */
-    private void initiateLocationUpdates(String locationProvider) {
+    private void initiateLocationUpdates(String locationProvider, long minUpdateDistance, long minUpdateTime) {
 
         if ( Build.VERSION.SDK_INT >= 23 &&
                 ContextCompat.checkSelfPermission( context, android.Manifest.permission.ACCESS_FINE_LOCATION ) != PackageManager.PERMISSION_GRANTED &&
@@ -144,8 +146,8 @@ public class CustomLocationListener implements LocationListener  {
             return  ;
         }
 
-        locationManager.requestLocationUpdates(locationProvider, MIN_TIME_BW_UPDATES,
-                                                MIN_DISTANCE_CHANGE_FOR_UPDATES, this);
+        locationManager.requestLocationUpdates(locationProvider, minUpdateTime, minUpdateDistance, this);
+
         if (locationManager != null)   {
             location = locationManager.getLastKnownLocation(locationProvider);
             updateCoordinates();
@@ -186,6 +188,20 @@ public class CustomLocationListener implements LocationListener  {
     private void updateCoordinates()     {
         this.latitude = location.getLatitude();
         this.longitude = location.getLongitude();
+    }
+
+    /**
+     * Adjusts the minimum time between updates and the minimum distance between
+     * updates with respect to the current location state
+     * TODO
+     */
+    private void adjustLocationUpdateMinimums() {
+        if (locationState == LocationEnum.IN_VEHICLE) {
+
+        }
+        else {
+
+        }
     }
 
     /**
