@@ -15,12 +15,14 @@ public class SyncUtil {
     // 1 hour (in seconds)
     private static final long SYNC_FREQUENCY = 10;
     // The authority for the sync adapter's content provider
-    public static final String AUTHORITY = "keshav.easy.data.sync.lib";
+    public static final String AUTHORITY = "keshav.com.drivingeventlib";
 
     // An account type, in the form of a domain name
     public static final String ACCOUNT_TYPE = "example.com";
     // The account name
     public static final String ACCOUNT_NAME = "dummyaccount";
+
+    public static Account CURRENT_ACCOUNT = null;
 
     /**
      * Create a new dummy account for the sync adapter
@@ -28,7 +30,6 @@ public class SyncUtil {
      * @param context The application context
      */
     public static Account CreateSyncAccount(Context context) {
-
 
         // Create the account type and default account
         Account newAccount = new Account( ACCOUNT_NAME, ACCOUNT_TYPE);
@@ -58,6 +59,7 @@ public class SyncUtil {
 
             Log.d( TAG, "Account created: " + newAccount.name );
 
+            CURRENT_ACCOUNT = newAccount;
             return newAccount;
         } else {
             /*

@@ -20,4 +20,61 @@
         android:text="Medium Text"
         android:id="@+id/tv_database"
         android:paddingTop="20sp"/>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="RERESH"
+            android:id="@+id/button_refresh"
+            />
+
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="CLEAR DATA"
+            android:id="@+id/button_delete_data"
+            />
+
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Request SYNC"
+            android:id="@+id/button_request_sync"/>
+    </LinearLayout>
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="LOAD GPS DATA"
+            android:id="@+id/button_loadgpsdata"
+            />
+
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="LOAD SENSOR DATA"
+            android:id="@+id/button_loadsensordata"
+            />
+    </LinearLayout>
+    <ScrollView
+        android:padding="15sp"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="no data loaded"
+            android:id="@+id/textview_db_data"/>
+    </ScrollView>
+
+
 </LinearLayout>

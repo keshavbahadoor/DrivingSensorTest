@@ -21,15 +21,21 @@ public class LocationDataTaskDelegator extends DrivingServiceTaskDelegator imple
     /**
      * The time in between action to be done on gps data
      */
-    private static final long TIME_INTERVAL_GPS_DATA = 2000L;
+    private static final long TIME_INTERVAL_GPS_DATA = 3000L;
     /**
      * The time inbetween to check for weather updates. This is in hours
      */
     private static final int WEATHER_UPDATE_TIME_INTERVAL_HOURS = 2;
 
+    public WeatherData currentWeatherData;
 
+    /**
+     * Constructor
+     * @param context
+     */
     public LocationDataTaskDelegator( Context context ) {
         super( context );
+        currentWeatherData = StoredPrefsHandler.retrieveWeatherData( context );
     }
 
     /**
@@ -48,23 +54,66 @@ public class LocationDataTaskDelegator extends DrivingServiceTaskDelegator imple
         // Note that weather data is only updated every 2 hours
         WeatherDataUtil.updateWeatherDataIfOutdated( context, this, latitude, longitude, -WEATHER_UPDATE_TIME_INTERVAL_HOURS );
 
+        saveLocationDataLocally( latitude, longitude, speed );
+    }
+
+    /**
+     * If we are in a moving vechile, store the gathered data locally.
+     * Last update time should be checked to ensure that the local Database is not flooded
+     * @param latitude current latitude loc
+     * @param longitude current longitude loc
+     * @param speed current speed
+     */
+    private void saveLocationDataLocally(double latitude, double longitude, float speed) {
+
+
+        if ( locationState == LocationEnum.IN_VEHICLE &&
+                (System.currentTimeMillis() - prevTime) > TIME_INTERVAL_GPS_DATA) {
+
+            currentWeatherData = StoredPrefsHandler.retrieveWeatherData( context );
+
+            LogService.log( "Proceeding to store GPS data." );
+            localStorage.addGPSData( "" + latitude, "" + longitude, speed,
+                                    currentWeatherData.weatherID,
+                                    currentWeatherData.rainVolume,
+                                    currentWeatherData.windSpeed,
+                                    currentWeatherData.temperature,
+                                    currentWeatherData.pressure,
+                                    currentWeatherData.humidity);
+
+            prevTime = System.currentTimeMillis();
+        }
+    }
+
+    /**
+     * If internet access is available, send data to server. otherwise, store data locally.
+     * This is an old method - new thought: all data should be stored locally, and only
+     * synced when internet access is avaiable
+     * @param latitude current latitude loc
+     * @param longitude current longitude loc
+     * @param speed current speed
+     */
+    private void handleLocationData(double latitude, double longitude, float speed){
+
         if ( locationState == LocationEnum.IN_VEHICLE &&
                 (System.currentTimeMillis() - prevTime) > TIME_INTERVAL_GPS_DATA) {
 
             LogService.log( "Proceeding to capture / store GPS data. " );
 
+            currentWeatherData = StoredPrefsHandler.retrieveWeatherData( context );
             if ( NetworkUtil.isNetworkAvailable( context ) ) {
 
-                WeatherData data = StoredPrefsHandler.retrieveWeatherData( context );
+                // post gps data using retrofit
 
-                ServerRequests.postGPSData( context,
-                        googleId, "" + latitude, "" + longitude, speed,
-                        data.weatherID, data.rainVolume, data.temperature, data.windSpeed,
-                        data.pressure, data.humidity
-                );
             } else {
                 // store data locally
-                localStorage.addGPSData( "" + latitude, "" + longitude, speed );
+                localStorage.addGPSData( "" + latitude, "" + longitude, speed,
+                                        currentWeatherData.weatherID,
+                                        currentWeatherData.rainVolume,
+                                        currentWeatherData.windSpeed,
+                                        currentWeatherData.temperature,
+                                        currentWeatherData.pressure,
+                                        currentWeatherData.humidity);
             }
             prevTime = System.currentTimeMillis();
         }

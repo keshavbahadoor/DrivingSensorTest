@@ -5,16 +5,23 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
+import android.widget.Toast;
 
+import com.driving.senor.test.CustomApplication;
 import com.driving.senor.test.R;
-import sensor.lib.LocationEnum;
-import sensor.lib.CustomLocationListener;
+import com.google.android.gms.location.LocationRequest;
+
 import keshav.com.utilitylib.LogService;
+import location.CustomLocationListener;
+import location.GoogleLocationService;
+import location.LocationEnum;
+import location.LocationSettings;
+import location.LocationUpdateDistance;
+import location.LocationUpdateTime;
 
 /**
  * Created by Keshav on 1/23/2016.
@@ -47,12 +54,15 @@ public class LocationFragment extends android.support.v4.app.Fragment implements
         context = fragment.getContext();
 
         fragment.findViewById( R.id.btn_getLocation ).setOnClickListener( this );
+        fragment.findViewById( R.id.button_location_low ).setOnClickListener( this );
+        fragment.findViewById( R.id.button_location_mid ).setOnClickListener( this );
+        fragment.findViewById( R.id.button_location_high ).setOnClickListener( this );
 
         onFoot = (TextView) fragment.findViewById( R.id.tv_onfoot );
         inVehicle = (TextView) fragment.findViewById( R.id.tv_invehicle );
         location = (TextView) fragment.findViewById( R.id.tv_locationdata );
 
-        context.registerReceiver( locationReceiver, new IntentFilter( CustomLocationListener.BROADCAST_ACTION ) );
+        context.registerReceiver( locationReceiver, new IntentFilter( LocationSettings.BROADCAST_ACTION ) );
 
         return fragment;
     }
@@ -62,7 +72,7 @@ public class LocationFragment extends android.support.v4.app.Fragment implements
         super.onStart();
         // This is needed here to avoid the error:
         // Attempt to invoke virtual method 'java.lang.Object android.content.Context.getSystemService(java.lang.String)' on a null object reference
-        //customLocationListener = CustomLocationListener.getLocationManager( context );
+        //customLocationListener = CustomLocationListener.getInstance( context );
     }
 
 
@@ -71,6 +81,44 @@ public class LocationFragment extends android.support.v4.app.Fragment implements
         if (v.getId() == R.id.btn_getLocation ) {
             //Log.d( "LOCATION", "Latitude : " + customLocationListener.getLatitude() + " Longitude : " + customLocationListener.getLongitude() );
             //setLocationResults();
+
+            CustomLocationListener.getInstance( context ).switchDebugMode();
+            LogService.log("Debug mode on for location: " + CustomLocationListener.getInstance( context ).locationState);
+        }
+        if (v.getId() == R.id.button_location_low) {
+//            GoogleLocationService.getInstance( context ).changeAccuracy(
+//                    LocationSettings.SLOW_INERVAL,
+//                    LocationSettings.SLOW_INERVAL,
+//                    LocationRequest.PRIORITY_LOW_POWER );
+
+
+            CustomLocationListener.getInstance( context ).changeAccuracy(
+                    LocationUpdateTime.AT_REST, LocationUpdateDistance.AT_REST
+            );
+            Toast.makeText( context, "Low accuracy", Toast.LENGTH_SHORT ).show();
+        }
+        if (v.getId() == R.id.button_location_mid) {
+//            GoogleLocationService.getInstance( context ).changeAccuracy(
+//                    LocationSettings.MEDIUM_INTERVAL,
+//                    LocationSettings.MEDIUM_INTERVAL,
+//                    LocationRequest.PRIORITY_BALANCED_POWER_ACCURACY );
+
+            CustomLocationListener.getInstance( context ).changeAccuracy(
+                    LocationUpdateTime.NORMAL, LocationUpdateDistance.NORMAL
+            );
+            Toast.makeText( context, "mid accuracy", Toast.LENGTH_SHORT ).show();
+        }
+        if (v.getId() == R.id.button_location_high) {
+//            GoogleLocationService.getInstance( context ).changeAccuracy(
+//                    LocationSettings.FAST_INTERVAL,
+//                    LocationSettings.FAST_INTERVAL,
+//                    LocationRequest.PRIORITY_HIGH_ACCURACY );
+
+            CustomLocationListener.getInstance( context ).changeAccuracy(
+                    LocationUpdateTime.AGGRESSIVE, LocationUpdateDistance.AGGRESSIVE
+            );
+
+            Toast.makeText( context, "high accuracy", Toast.LENGTH_SHORT ).show();
         }
     }
 

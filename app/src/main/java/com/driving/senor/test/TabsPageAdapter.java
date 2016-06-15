@@ -6,6 +6,7 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 
 import fragments.DatabaseFragment;
+import fragments.DebugSettingsFragment;
 import fragments.LocationFragment;
 import fragments.LogFragment;
 import fragments.SensorFragment;
@@ -57,7 +58,7 @@ public class TabsPageAdapter extends FragmentPagerAdapter {
             case 1: return new LocationFragment();
             case 2: return new LogFragment();
             case 3: return new DatabaseFragment();
-
+            case 4: return new DebugSettingsFragment();
         }
         return null;
     }

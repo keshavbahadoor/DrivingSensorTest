@@ -8,12 +8,15 @@ android {
         minSdkVersion 15
         targetSdkVersion 23
         versionCode 1
-        versionName "1.0"
+        versionName "1.1"
     }
     buildTypes {
         release {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+        }
+        debug {
+            debuggable true
         }
     }
 }
@@ -26,67 +29,70 @@ dependencies {
     compile project(':SimpleRestClient')
     // compile project(':UtilityLib')
     compile 'DrivingSensorTest:UtilityLib:unspecified'
-    compile 'com.google.android.gms:play-services-location:9.0.1'
+    compile 'com.google.android.gms:play-services-location:9.0.2'
+    compile 'com.squareup.retrofit2:retrofit:2.0.2'
+    compile 'com.squareup.retrofit2:converter-gson:2.0.2'
+    compile 'com.squareup.okhttp3:logging-interceptor:3.2.0'
 }
 
-version = '1.0'
-//
-//apply plugin: 'com.jfrog.bintray'
-//apply plugin: 'com.github.dcendents.android-maven'
-//
-//
-//
-//bintray {
-//    // Bintray username
-//    user = 'keshavbahadoor'
-//
-//    // Bintray key
-//    key = '846bd3cd59a0b1a1921ab106605377dabc95f844'
-//    pkg {
-//        repo = 'maven'
-//
-//        // Name of the project on bintray
-//        name = 'driving-event-lib'
-//
-//        // should match the license you created on bintray
-//        licenses = ['Apache-2.0']
-//
-//        // Github urls of the project
-//        vcsUrl = 'https://github.com/keshavbahadoor/DrivingSensorTest.git'
-//        websiteUrl = 'https://github.com/keshavbahadoor/DrivingSensorTest'
-//
-//        version {
-//            name = 'android-util-pak'
-//            desc = 'Utils'
-//            released  = new Date()
-//            vcsTag = '1.0'
-//        }
-//    }
-//    configurations = ['archives']
-//}
-//
-//task generateSourcesJarDEL(type: Jar) {
-//    from android.sourceSets.main.java.srcDirs
-//    classifier 'sources'
-//}
-//
-//task generateJavadocsDEL(type: Javadoc) {
-//
-//    source = android.sourceSets.main.java.srcDirs
-//    classpath += project.files(android.getBootClasspath().join(File.pathSeparator))
-//    failOnError false
-//}
-//
-//task generateJavadocsJarDEL(type: Jar) {
-//    from generateJavadocsDEL.destinationDir
-//    classifier 'javadoc'
-//}
-//
-//
-//generateJavadocsJarDEL.dependsOn generateJavadocsDEL
-//
-//artifacts {
-//    archives generateJavadocsJarDEL
-//    archives generateSourcesJarDEL
-//}
+version = '1.1'
+
+apply plugin: 'com.jfrog.bintray'
+apply plugin: 'com.github.dcendents.android-maven'
+
+
+
+bintray {
+    // Bintray username
+    user = 'keshavbahadoor'
+
+    // Bintray key
+    key = '846bd3cd59a0b1a1921ab106605377dabc95f844'
+    pkg {
+        repo = 'maven'
+
+        // Name of the project on bintray
+        name = 'driving-event-lib'
+
+        // should match the license you created on bintray
+        licenses = ['Apache-2.0']
+
+        // Github urls of the project
+        vcsUrl = 'https://github.com/keshavbahadoor/DrivingSensorTest.git'
+        websiteUrl = 'https://github.com/keshavbahadoor/DrivingSensorTest'
+
+        version {
+            name = 'android-util-pak'
+            desc = 'Utils'
+            released  = new Date()
+            vcsTag = '1.0'
+        }
+    }
+    configurations = ['archives']
+}
+
+task generateSourcesJarDEL(type: Jar) {
+    from android.sourceSets.main.java.srcDirs
+    classifier 'sources'
+}
+
+task generateJavadocsDEL(type: Javadoc) {
+
+    source = android.sourceSets.main.java.srcDirs
+    classpath += project.files(android.getBootClasspath().join(File.pathSeparator))
+    failOnError false
+}
+
+task generateJavadocsJarDEL(type: Jar) {
+    from generateJavadocsDEL.destinationDir
+    classifier 'javadoc'
+}
+
+
+generateJavadocsJarDEL.dependsOn generateJavadocsDEL
+
+artifacts {
+    archives generateJavadocsJarDEL
+    archives generateSourcesJarDEL
+}
 

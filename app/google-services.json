@@ -1,15 +1,12 @@
 {
   "project_info": {
-    "project_id": "drivingsensortest",
     "project_number": "495518873198",
-    "name": "DrivingSensorTest"
+    "project_id": "drivingsensortest"
   },
   "client": [
     {
       "client_info": {
         "mobilesdk_app_id": "1:495518873198:android:ff10e701e365573f",
-        "client_id": "android:com.driving.senor.test",
-        "client_type": 1,
         "android_client_info": {
           "package_name": "com.driving.senor.test"
         }
@@ -22,23 +19,24 @@
             "package_name": "com.driving.senor.test",
             "certificate_hash": "852C8AB5CD710E9E60CCC9C6549F045F48E6C67F"
           }
+        },
+        {
+          "client_id": "495518873198-5lbrk9ho9p838he3jn0cdbsgc66n2tq7.apps.googleusercontent.com",
+          "client_type": 3
         }
       ],
-      "api_key": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDytTn4b6Rye-_FKt3lOofq51H9EPSTBHM"
+        }
+      ],
       "services": {
         "analytics_service": {
           "status": 1
         },
-        "cloud_messaging_service": {
-          "status": 1,
-          "apns_config": []
-        },
         "appinvite_service": {
           "status": 1,
           "other_platform_oauth_client": []
-        },
-        "google_signin_service": {
-          "status": 2
         },
         "ads_service": {
           "status": 1
@@ -46,6 +44,5 @@
       }
     }
   ],
-  "client_info": [],
-  "ARTIFACT_VERSION": "1"
+  "configuration_version": "1"
 }

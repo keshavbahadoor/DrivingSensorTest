@@ -14,7 +14,7 @@ public class AccelerometerDataTaskDelegator extends DrivingServiceTaskDelegator 
     /**
      * The time in-between action to be done on accelerometer data
      */
-    private static final long TIME_INTERVAL_ACCELEROMETER = 4000L;
+    private static final long TIME_INTERVAL_ACCELEROMETER = 500L;
 
 
     public AccelerometerDataTaskDelegator( Context context ) {
@@ -24,9 +24,7 @@ public class AccelerometerDataTaskDelegator extends DrivingServiceTaskDelegator 
 
     /**---------------------------------------------------------------------------------------------
      * Handles the received accelerometer data values
-     * - if we are in the vehicle and adequate time has elapsed, then we send the data
-     *      to the server depending on network connection.
-     *      If no network connectivity, then we store data locally instead.
+     * - if we are in the vehicle and adequate time has elapsed, then we handle the data
      * @param values Current raw sensor data
      *--------------------------------------------------------------------------------------------*/
     @Override
@@ -34,17 +32,35 @@ public class AccelerometerDataTaskDelegator extends DrivingServiceTaskDelegator 
 
         if (  (System.currentTimeMillis() - prevTime) > TIME_INTERVAL_ACCELEROMETER ) {
 
-            values = SensorFilter.applyLowPassFilterRounded(
-                    SensorFilter.applyHighPassFilter( values ) );
+            saveAccelerationDataLocally(SensorFilter.applyLowPassFilterRounded(
+                                        SensorFilter.applyHighPassFilter( values ) ));
 
-            LogService.log( "Proceeding to capture / store acceleration data. " );
-            if ( NetworkUtil.isNetworkAvailable( context ) ) {
-                ServerRequests.postAccelerationData( context,
-                        googleId, values[0], values[1], values[2] );
-            } else {
-                localStorage.addSensorData( values[0], values[1], values[2] );
-            }
             prevTime = System.currentTimeMillis();
+        }
+    }
+
+    /**
+     * Saves the data to local database instance
+     * @param values Current raw sensor data
+     */
+    private void saveAccelerationDataLocally(float[] values) {
+        LogService.log( "Proceeding to store acceleration data. " );
+        localStorage.addSensorData( values[0], values[1], values[2] );
+    }
+
+    /**
+     * If internet access is available, the data is sent to the server.
+     * Otherwise it is stored locally.
+     * This is an old method - new thought: all data should be stored locally, and only
+     * synced when internet access is avaiable
+     * @param values Current raw sensor data
+     */
+    private void handleAccelerationData(float[] values) {
+        LogService.log( "Proceeding to capture / store acceleration data. " );
+        if ( NetworkUtil.isNetworkAvailable( context ) ) {
+            // Add acceleration data using retrofit
+        } else {
+            saveAccelerationDataLocally(values);
         }
     }
 }

@@ -66,11 +66,22 @@ public class WeatherDataUtil {
     public static void updateWeatherDataIfOutdated(Context context, OnTaskComplete listener, double latitude, double longitude, int hours) {
 
         WeatherData data = StoredPrefsHandler.retrieveWeatherData( context );
-        LogService.log( data.toString() );
+        //LogService.log( data.toString() );
         if (data.date.length() != 0 && DateUtil.dateHasPassed( data.date, hours )) {
             LogService.log( "Updating weather data..." );
-            ServerRequests.getCurrentWeatherData( context, listener, "" + latitude, "" + longitude );
+            // ServerRequests.getCurrentWeatherData( context, listener, "" + latitude, "" + longitude );
         }
+    }
+
+    /**
+     * Does post request to update local weather data
+     * @param latitude
+     * @param longitude
+     */
+    private static void updateWeatherData(double latitude, double longitude) {
+
+
+
     }
 
 

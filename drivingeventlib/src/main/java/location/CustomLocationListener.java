@@ -25,12 +25,6 @@ import java.util.Calendar;
 public class CustomLocationListener implements LocationListener  {
 
 
-    public static final String BROADCAST_ACTION = "LOCATION_CHANGED";
-    /**
-     * in ms^-1 (approx. 20 kmp/h)
-     */
-    public static final float IN_VEHICLE_THRESHHOLD = 5.5555F;
-
     public static int MY_PERMISSION_ACCESS_COURSE_LOCATION;
 
     //The minimum distance to change updates in meters
@@ -63,11 +57,13 @@ public class CustomLocationListener implements LocationListener  {
     public float maxCalculatedSpeed = 0.0F;
     private long previousTimeStamp = 0L;
 
+    private boolean debugMode = false;
+
     /**
      * Singleton implementation
      * @return instance
      */
-    public static CustomLocationListener getLocationManager(Context context)     {
+    public static CustomLocationListener getInstance( Context context)     {
         if (instance == null) {
             instance = new CustomLocationListener(context);
         }
@@ -80,9 +76,31 @@ public class CustomLocationListener implements LocationListener  {
     private CustomLocationListener( Context c )     {
 
         context = c;
-        initLocationService(LocationUpdateDistance.AGGRESSIVE, LocationUpdateTime.AGGRESSIVE);
+        initLocationService(LocationUpdateDistance.AT_REST, LocationUpdateTime.AT_REST);
         dataMessage = new GPSDataMessage();
         LogService.log("CustomLocationListener created");
+    }
+
+    /**
+     * Allows clients to change the accuracy of the rate of updates of location service
+     * This requires a permission check
+     * @param updateTime minimum update time in miliseconds
+     * @param updateDistance minimum update distance in meters
+     */
+    public void changeAccuracy(long updateTime, long updateDistance) {
+
+        if ( Build.VERSION.SDK_INT >= 23 &&
+                ContextCompat.checkSelfPermission( context, android.Manifest.permission.ACCESS_FINE_LOCATION ) != PackageManager.PERMISSION_GRANTED &&
+                ContextCompat.checkSelfPermission( context, android.Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            return  ;
+        }
+
+        if (locationManager != null ){
+            locationManager.removeUpdates( this );
+            initLocationService( updateDistance, updateTime );
+
+            LogService.log( "Location Changed!" );
+        }
     }
 
     /**
@@ -165,10 +183,13 @@ public class CustomLocationListener implements LocationListener  {
             calculateSpeed = ( location.distanceTo( previousLocation ) / ( Calendar.getInstance().getTimeInMillis() - previousTimeStamp ) * 1000 );
             previousTimeStamp = Calendar.getInstance().getTimeInMillis();
 
-            if ( speed <= IN_VEHICLE_THRESHHOLD ) {
+            if ( speed <= LocationSettings.IN_VEHICLE_THRESHHOLD ) {
                 locationState = LocationEnum.STATIONARY;
             }
-            if ( speed > IN_VEHICLE_THRESHHOLD ) {
+            if ( speed > LocationSettings.IN_VEHICLE_THRESHHOLD ) {
+                locationState = LocationEnum.IN_VEHICLE;
+            }
+            if ( debugMode ) {
                 locationState = LocationEnum.IN_VEHICLE;
             }
             if ( speed > maxSpeed ) {
@@ -190,19 +211,7 @@ public class CustomLocationListener implements LocationListener  {
         this.longitude = location.getLongitude();
     }
 
-    /**
-     * Adjusts the minimum time between updates and the minimum distance between
-     * updates with respect to the current location state
-     * TODO
-     */
-    private void adjustLocationUpdateMinimums() {
-        if (locationState == LocationEnum.IN_VEHICLE) {
 
-        }
-        else {
-
-        }
-    }
 
     /**
      * sets previous location, updates coordinates, calculates speed, and sends broadcast
@@ -216,7 +225,7 @@ public class CustomLocationListener implements LocationListener  {
         calculateSpeed( newLocation );
         dataMessage.updateData( latitude, longitude, speed );
 
-        Intent intent = new Intent(BROADCAST_ACTION);
+        Intent intent = new Intent(LocationSettings.BROADCAST_ACTION);
         intent.putExtra( "latitude", latitude );
         intent.putExtra( "longitude", longitude );
         intent.putExtra( "speed", speed );
@@ -291,6 +300,8 @@ public class CustomLocationListener implements LocationListener  {
         return isGPSEnabled;
     }
 
-
+    public void switchDebugMode() {
+        debugMode ^= true;
+    }
 
 }

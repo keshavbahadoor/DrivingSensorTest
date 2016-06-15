@@ -1,37 +1,65 @@
 package com.driving.senor.test;
 
+import android.accounts.Account;
 import android.app.Dialog;
+import android.content.ComponentName;
+import android.content.ContentResolver;
 import android.content.Context;
 import android.content.Intent;
+import android.content.ServiceConnection;
 import android.content.SharedPreferences;
+import android.content.SyncStatusObserver;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
+import android.os.IBinder;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Toast;
 
-import services.DataCacheService;
+import datasync.DataSyncAdapter;
+import datasync.SyncUtil;
+import location.CustomLocationListener;
 import services.DrivingService;
-import services.SensorService;
-import sensor.lib.CustomLocationListener;
 import user.management.GooglePlusHandler;
 import keshav.com.utilitylib.DialogFactory;
 import keshav.com.utilitylib.LogService;
 import user.management.UserData;
 
-public class MainActivity extends AppCompatActivity implements View.OnClickListener {
+public class MainActivity extends AppCompatActivity implements View.OnClickListener, SyncStatusObserver {
 
     public static final String CURRENT_ACCOUNT_ID_PREF = "ACCOUNT_ID_NUMBER";
     private GooglePlusHandler googlePlusHandler;
     private Dialog signInDialog;
     private Toolbar toolbar;
+    private DataSyncAdapter dataSyncAdapter;
+    private Account mAccount;
 
+    private DrivingService drivingService;
+    private boolean mBounded;
+    private DrivingService.LocalBinder drivingServiceBinder;
+//    ServiceConnection mConnection = new ServiceConnection() {
+//        @Override
+//        public void onServiceConnected( ComponentName name, IBinder service ) {
+//            LogService.log( "====> Drive Service Connected! " );
+//            mBounded = true;
+//            drivingServiceBinder = (DrivingService.LocalBinder) service;
+//            drivingService =  drivingServiceBinder.getService();
+//        }
+//
+//        @Override
+//        public void onServiceDisconnected( ComponentName name ) {
+//            LogService.log( "====> Drive Service Disconnected! " );
+//            mBounded = false;
+//            drivingService = null;
+//        }
+//    };
 
 
     @Override
@@ -77,7 +105,30 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         if (! googlePlusHandler.isSignedIn()) {
             signInDialog.show();
         } else {
-            this.startService( new Intent( this.getApplicationContext(), DrivingService.class ) );
+            launchServiceAndSyncAdapter();
+        }
+    }
+
+    /**
+     * Launches Driving service as well as the sync adapter.
+     * Sync adapter is responsible for transfering data to server.
+     */
+    private void launchServiceAndSyncAdapter() {
+        this.startService( new Intent( this.getApplicationContext(), DrivingService.class ) );
+
+//        Intent intent = new Intent(getApplicationContext(), DrivingService.class);
+//        bindService( intent, mConnection, BIND_AUTO_CREATE );
+//        mBounded = true;
+
+        ((CustomApplication) getApplication()).setDrivingService( drivingService );
+
+        mAccount = SyncUtil.CreateSyncAccount( this );
+        if (mAccount != null) {
+            dataSyncAdapter = new DataSyncAdapter( this, true );
+            ContentResolver.addStatusChangeListener(1, this);
+            ContentResolver.setIsSyncable( mAccount, SyncUtil.AUTHORITY, 1 );
+            ContentResolver.setSyncAutomatically( mAccount, SyncUtil.AUTHORITY, true );
+            ContentResolver.addPeriodicSync( mAccount, SyncUtil.AUTHORITY, Bundle.EMPTY, 10 );
         }
     }
 
@@ -137,5 +188,16 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
 
         }
+    }
+
+    /**
+     * Called when the status of the sync adapter observer changes
+     * @param which
+     */
+    @Override
+    public void onStatusChanged( int which ) {
+        LogService.log( "Status changed: " + which);
+        LogService.log(  "is Sync active: " + ContentResolver.isSyncActive( mAccount, SyncUtil.AUTHORITY ));
+        LogService.log(  "is Sync Pending: " + ContentResolver.isSyncPending( mAccount, SyncUtil.AUTHORITY ) );
     }
 }

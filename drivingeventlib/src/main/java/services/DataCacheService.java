@@ -135,7 +135,7 @@ public class DataCacheService extends Service implements OnTaskComplete {
 //                        dataMessage.speed );
             } else {
                 // store data locally
-                localStorage.addGPSData( "" + dataMessage.latitude, "" + dataMessage.longitude, dataMessage.speed );
+                //localStorage.addGPSData( "" + dataMessage.latitude, "" + dataMessage.longitude, dataMessage.speed );
             }
             prevTimeGPS = System.currentTimeMillis();
         }

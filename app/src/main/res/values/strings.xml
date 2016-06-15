@@ -9,6 +9,8 @@
         <item>Sensors</item>
         <item>GPS</item>
         <item>Log</item>
+        <item>Database</item>
+        <item>Debug Settings</item>
     </string-array>
 
 </resources>

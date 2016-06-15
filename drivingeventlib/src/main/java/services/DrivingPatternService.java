@@ -95,7 +95,7 @@ public class DrivingPatternService extends Service implements SensorEventListene
 //            EventBus.getDefault().unregister( this );
 //        }
         EventBus.getDefault().register( this );
-        customLocationListener = CustomLocationListener.getLocationManager( this.getApplicationContext() );
+        customLocationListener = CustomLocationListener.getInstance( this.getApplicationContext() );
         return START_STICKY;
     }
 

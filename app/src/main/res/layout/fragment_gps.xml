@@ -43,7 +43,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:textAppearance="?android:attr/textAppearanceLarge"
-        android:text="On Foot"
+        android:text="Stationary"
         android:id="@+id/tv_onfoot"
         android:textAlignment="center"
         android:textColor="#023d00"
@@ -65,5 +65,36 @@
         android:paddingBottom="10dp"
         android:paddingLeft="10dp"
         android:paddingRight="10dp"/>
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceMedium"
+        android:text="Change Location Accuracy:"
+        android:id="@+id/textView8"
+        android:paddingTop="18sp"/>
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="LOW"
+            android:id="@+id/button_location_low"/>
+
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="MID"
+            android:id="@+id/button_location_mid"/>
+
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="HIGH"
+            android:id="@+id/button_location_high"/>
+    </LinearLayout>
+
 
 </LinearLayout>
