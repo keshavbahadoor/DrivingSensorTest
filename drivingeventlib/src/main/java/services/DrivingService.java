@@ -14,16 +14,20 @@ import android.os.IBinder;
 import android.support.v4.content.LocalBroadcastManager;
 import android.widget.Toast;
 
+import com.google.android.gms.location.DetectedActivity;
+
+import java.util.ArrayList;
+import java.util.List;
+
 import datalayer.StoredPrefsHandler;
 import datasync.DataSyncAdapter;
 import keshav.com.drivingeventlib.GLOBALS;
 import keshav.com.utilitylib.LogService;
-import location.CustomLocationListener;
+import location.AbstractLocationService;
+import location.AndroidLocationService;
 import location.GoogleLocationService;
 import location.LocationEnum;
 import location.LocationSettings;
-import location.LocationUpdateDistance;
-import location.LocationUpdateTime;
 
 /**
  * MAIN BACKGROUND SERVICE
@@ -37,12 +41,20 @@ public class DrivingService extends Service implements SensorEventListener  {
     private String googleID;
     private SensorManager sensorManager;
     private Sensor accelerometerSensor;
-    private CustomLocationListener customLocationListener;
-    private GoogleLocationService googleLocationService;
     private LocationEnum locationState;
     private LocationEnum previousLocationState;
     private AccelerometerDataTaskDelegator accelerometerDataTaskDelegator;
     private LocationDataTaskDelegator locationDataTaskDelegator;
+    private AbstractLocationService locationService;
+
+    /**
+     * Keeps the last recent detected activities. This is used to filter out false positives.
+     * If the list contains all of the same detected activities, then we can assume that the currently
+     * detected activity is occurring.
+     */
+    private List<Integer> detectedActivities;
+    private static final int MAX_DETECTED_ACTIVITIES = 3;
+
 
     // Storage for an instance of the sync adapter
     private static DataSyncAdapter dataSyncAdapter = null;
@@ -61,13 +73,21 @@ public class DrivingService extends Service implements SensorEventListener  {
         @Override
         public void onReceive( Context context, Intent intent ) {
             LogService.log( "GPS broadcast receiver called" );
-
-            updateLocationState();
-
-
-
+            // updateLocationState();
             // handle location data
             locationDataTaskDelegator.handleTask( intent );
+        }
+    };
+
+    /**
+     * This is called when the detected activity is changed
+     * Origin: ActivityRecognitionService
+     */
+    private BroadcastReceiver activityReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive( Context context, Intent intent ) {
+            LogService.log( "Activity Recognition Receiver called" );
+            updateLocationState( intent.getIntExtra( "activity", DetectedActivity.STILL ) );
         }
     };
 
@@ -100,7 +120,7 @@ public class DrivingService extends Service implements SensorEventListener  {
         // init sensor related vars
         sensorManager = (SensorManager) this.getApplicationContext().getSystemService( Context.SENSOR_SERVICE );
         accelerometerSensor = sensorManager.getDefaultSensor( Sensor.TYPE_ACCELEROMETER );
-        sensorManager.registerListener( this, accelerometerSensor, SensorManager.SENSOR_DELAY_NORMAL );
+        //sensorManager.registerListener( this, accelerometerSensor, SensorManager.SENSOR_DELAY_NORMAL );
 
         // init location related vars
         locationState = LocationEnum.STATIONARY;
@@ -110,7 +130,13 @@ public class DrivingService extends Service implements SensorEventListener  {
         googleID = StoredPrefsHandler.getGoogleAccountID( this.getApplicationContext() );
 
         // Set up broadcast receiver
-        registerBroadcastReceiver();
+        registerBroadcastReceivers();
+
+        // Set up detected activities list
+        detectedActivities = new ArrayList<>();
+        for (int i=0; i<MAX_DETECTED_ACTIVITIES; i++) {
+            detectedActivities.add( -1 );
+        }
 
         /*
          * Create the sync adapter as a singleton.
@@ -123,8 +149,11 @@ public class DrivingService extends Service implements SensorEventListener  {
             }
         }
 
-        // init google location handler
-        //googleLocationService = GoogleLocationService.getInstance( getApplicationContext() );
+        // init location service. Service created can either be basic Android Location service
+        // or Google based location service utilizing Fused Location APIs
+        // locationService = AndroidLocationService.getInstance( getApplicationContext() );
+        locationService = GoogleLocationService.getInstance( getApplicationContext() );
+        GLOBALS.locationService = locationService;
 
         LogService.log( "DRIVING SERVICE CREATED" );
     }
@@ -132,11 +161,13 @@ public class DrivingService extends Service implements SensorEventListener  {
     /**
      * Can be used to rereigster listener
      */
-    public void registerBroadcastReceiver() {
+    public void registerBroadcastReceivers() {
         LocalBroadcastManager.getInstance( this.getApplicationContext() )
                 .unregisterReceiver( gpsDataReceiver );
         LocalBroadcastManager.getInstance( this.getApplicationContext() )
                 .registerReceiver( gpsDataReceiver, new IntentFilter( LocationSettings.BROADCAST_ACTION ) );
+        LocalBroadcastManager.getInstance( this.getApplicationContext() )
+                .registerReceiver( activityReceiver, new IntentFilter( ActivityRecognitionService.BROADCAST_ACTION ) );
     }
 
     /**
@@ -149,7 +180,7 @@ public class DrivingService extends Service implements SensorEventListener  {
         this.sensorManager.unregisterListener( this );
         LocalBroadcastManager.getInstance( this.getApplicationContext() ).unregisterReceiver( gpsDataReceiver );
 
-        //customLocationListener.destroy();
+        locationService.onDestroyActions();
         LogService.log( "Driving Service has ended" );
         Toast.makeText( this.getApplicationContext(), "Driving Service has ended", Toast.LENGTH_SHORT ).show();
     }
@@ -165,8 +196,8 @@ public class DrivingService extends Service implements SensorEventListener  {
     @Override
     public int onStartCommand( Intent intent, int flags, int startId ) {
         super.onStartCommand( intent, flags, startId );
-        customLocationListener = CustomLocationListener.getInstance( this.getApplicationContext() );
-        //googleLocationService.onStartActions();
+
+        //locationService.onStartActions();
 
         return START_STICKY;
     }
@@ -199,18 +230,27 @@ public class DrivingService extends Service implements SensorEventListener  {
      * the CustomLocationListener object.
      * If DEBUG_ALWAYS_IN_VEHICLE is true, we send a false location state of always in vehicle.
      */
-    private void updateLocationState() {
+    private void updateLocationState(int activity) {
 
         LogService.log( "LOCation state ---- " + locationState );
 
         if ( GLOBALS.DEBUG_ALWAYS_IN_VEHICLE ) {
             locationState = LocationEnum.IN_VEHICLE;
         } else {
-            locationState = customLocationListener.locationState;
-            //locationState = googleLocationService.getLocationState();
+            // Add to list of current activities
+            addDetectedActivity( activity );
+
+            // use activity recognition instead of location based state:
+            if ( allActivitiesContains( DetectedActivity.IN_VEHICLE )) {
+                locationService.setHighAccuracy();
+                locationState = LocationEnum.IN_VEHICLE;
+            } else {
+                locationService.onStopActions();
+                locationState = LocationEnum.STATIONARY;
+            }
         }
 
-        // Update other dependancies
+        // Update other dependencies
         accelerometerDataTaskDelegator.updateLocationState( locationState );
         locationDataTaskDelegator.updateLocationState( locationState );
 
@@ -228,14 +268,12 @@ public class DrivingService extends Service implements SensorEventListener  {
         if ( locationState == LocationEnum.IN_VEHICLE ) {
             LogService.log( "*** Increasing detection sensitivity ***" );
             sensorManager.registerListener( this, accelerometerSensor, SensorManager.SENSOR_DELAY_FASTEST );
-            customLocationListener.changeAccuracy( LocationUpdateTime.AGGRESSIVE,
-                                                   LocationUpdateDistance.AGGRESSIVE );
+            //locationService.setHighAccuracy();
 
         } else {
             LogService.log( "*** Decreasing detection sensitivity ***" );
             sensorManager.unregisterListener( this );
-            customLocationListener.changeAccuracy( LocationUpdateTime.AT_REST,
-                    LocationUpdateDistance.AT_REST );
+            //locationService.setLowAccuracy();
         }
     }
 
@@ -256,6 +294,32 @@ public class DrivingService extends Service implements SensorEventListener  {
          */
          return dataSyncAdapter.getSyncAdapterBinder();
         //return mBinder;
+    }
+
+    /**
+     * Adds to the detected activity list.
+     * @param activity
+     */
+    private void addDetectedActivity(int activity) {
+        if (detectedActivities.size() >= MAX_DETECTED_ACTIVITIES) {
+            detectedActivities.remove( 0 );
+        }
+        detectedActivities.add( activity );
+    }
+
+    /**
+     * Checks the current hold of activities against a given activity
+     * if all the activities equate the given activity, return true. Else return false.
+     * @param activity
+     * @return
+     */
+    private boolean allActivitiesContains(int activity){
+        for (int i : detectedActivities){
+           if (i != activity){
+               return false;
+           }
+        }
+        return true;
     }
 
 

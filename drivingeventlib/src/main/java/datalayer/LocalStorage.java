@@ -38,6 +38,12 @@ public class LocalStorage extends SQLiteOpenHelper {
     private static final String GPSData_temp = "temp";
     private static final String GPSData_pressure = "pressure";
     private static final String GPSData_humidity = "humidity";
+    private static final String TABLE_LOG = "LOG";
+    private static final String LOG_NAME = "name";
+    private static final String LOG_TIME = "time";
+    private static final String LOG_MSG = "msg";
+
+
     //public static final String TABLE_DrivingEvent = "DrivingEvent";
     private SimpleDateFormat dateFormat;
     private Date date;
@@ -61,6 +67,12 @@ public class LocalStorage extends SQLiteOpenHelper {
                                                             GPSData_pressure+       " DOUBLE, "+
                                                             GPSData_humidity+       " DOUBLE, "+
                                                             COL_TIME+               " TEXT)";
+
+    private static final String CREATE_TABLE_LOG = "CREATE TABLE IF NOT EXISTS " + TABLE_LOG + " (" +
+                                                        COL_ID+ " INTEGER PRIMARY KEY AUTOINCREMENT, " +
+                                                        LOG_NAME + " TEXT, " +
+                                                        LOG_MSG + " TEXT, " +
+                                                        LOG_TIME + " TEXT) ";
     private static final String DROP_TABLE = "DROP TABLE IF EXISTS ";
     private static final String SELECT_COUNT = "SELECT COUNT(*) FROM ";
     private static final String DELETE_SEQUENCE = "DELETE FROM SQLITE_SEQUENCE WHERE NAME = ";
@@ -93,6 +105,7 @@ public class LocalStorage extends SQLiteOpenHelper {
     public void onCreate( SQLiteDatabase db ) {
         db.execSQL( CREATE_TABLE_SensorData );
         db.execSQL( CREATE_TABLE_GPSData );
+        db.execSQL( CREATE_TABLE_LOG );
     }
 
     @Override
@@ -100,6 +113,7 @@ public class LocalStorage extends SQLiteOpenHelper {
         if ( newVersion > oldVersion) {
             db.execSQL( DROP_TABLE  + TABLE_GPSData);
             db.execSQL( DROP_TABLE  + TABLE_SensorData);
+            db.execSQL( DROP_TABLE + TABLE_LOG );
             this.onCreate( db );
         }
     }
@@ -119,7 +133,7 @@ public class LocalStorage extends SQLiteOpenHelper {
         values.put( SensorData_AccX, accX );
         values.put( SensorData_AccY, accY );
         values.put( SensorData_AccZ, accZ );
-        values.put( COL_TIME, dateFormat.format( date.getTime() ) );
+        values.put( COL_TIME, dateFormat.format( System.currentTimeMillis() ) );
         getReadableDatabase().insert( TABLE_SensorData, null, values );
     }
 
@@ -144,7 +158,7 @@ public class LocalStorage extends SQLiteOpenHelper {
         values.put( GPSData_temp, temp );
         values.put( GPSData_pressure, pressure );
         values.put( GPSData_humidity, humidity );
-        values.put( COL_TIME, dateFormat.format( date.getTime() ) );
+        values.put( COL_TIME, dateFormat.format( System.currentTimeMillis() ) );
         getReadableDatabase().insert( TABLE_GPSData, null, values );
     }
 
@@ -198,6 +212,7 @@ public class LocalStorage extends SQLiteOpenHelper {
     public void deleteAll(){
         deleteAllFromTable( TABLE_GPSData );
         deleteAllFromTable( TABLE_SensorData );
+        deleteAllFromTable( TABLE_LOG );
     }
 
     /**
@@ -248,7 +263,7 @@ public class LocalStorage extends SQLiteOpenHelper {
         JSONArray resultSet = new JSONArray(  );
         try {
             SQLiteDatabase db = this.getReadableDatabase();
-            Cursor cursor = db.rawQuery("SELECT * FROM " + table + " ORDER BY " + COL_ID + " DESC LIMIT " + row + ";", null );
+            Cursor cursor = db.rawQuery("SELECT * FROM " + table + " ORDER BY " + COL_ID + " ASC LIMIT " + row + ";", null );
             cursor.moveToFirst();
             int i = 0, totalColumn;
             while (! cursor.isAfterLast()) {
@@ -293,5 +308,19 @@ public class LocalStorage extends SQLiteOpenHelper {
      */
     public String getGPSDataCount() {
         return getDatabaseCount( TABLE_GPSData );
+    }
+
+
+    /**
+     * Adds to the log table
+     * @param name
+     * @param message
+     */
+    public void addLogEntry(String name, String message) {
+        ContentValues values = new ContentValues(  );
+        values.put( LOG_NAME, name );
+        values.put( LOG_MSG, message );
+        values.put( LOG_TIME, dateFormat.format( System.currentTimeMillis() ) );
+        getReadableDatabase().insert( TABLE_LOG, null, values );
     }
 }

@@ -1,5 +1,7 @@
 package keshav.com.drivingeventlib;
 
+import location.AbstractLocationService;
+
 /**
  * Created by Keshav on 2/27/2016.
  */
@@ -11,9 +13,11 @@ public class GLOBALS {
      */
     public static final boolean DEBUG_MODE = false;
 
-    public static final boolean DEBUG_ALWAYS_IN_VEHICLE = true;
+    public static final boolean DEBUG_ALWAYS_IN_VEHICLE = false;
 
     public static final boolean DEBUG_DATA_SYNC = false;
+
+    public static AbstractLocationService locationService;
 
 
     public static final String APPLICATION_SERVER = "http://104.236.253.74/";

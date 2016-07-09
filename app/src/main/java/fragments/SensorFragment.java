@@ -122,7 +122,7 @@ public class SensorFragment extends android.support.v4.app.Fragment implements V
         fragment.findViewById( R.id.fBtn_actionbutton ).setOnClickListener( this );
         fragment.findViewById( R.id.btn_reset ).setOnClickListener( this );
 
-        context.registerReceiver( receiver, new IntentFilter( SensorService.BROADCAST_ACTION ) );
+        //context.registerReceiver( receiver, new IntentFilter( SensorService.BROADCAST_ACTION ) );
         return fragment;
     }
 
@@ -132,7 +132,7 @@ public class SensorFragment extends android.support.v4.app.Fragment implements V
     @Override
     public void onStop() {
         super.onStop();
-        context.stopService( new Intent( context, SensorService.class ) );
+        //context.stopService( new Intent( context, SensorService.class ) );
         try {
             context.unregisterReceiver( receiver );
             EventBus.getDefault().unregister( this );

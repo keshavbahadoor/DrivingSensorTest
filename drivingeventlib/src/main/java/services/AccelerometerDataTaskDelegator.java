@@ -44,7 +44,7 @@ public class AccelerometerDataTaskDelegator extends DrivingServiceTaskDelegator 
      * @param values Current raw sensor data
      */
     private void saveAccelerationDataLocally(float[] values) {
-        LogService.log( "Proceeding to store acceleration data. " );
+        //LogService.log( "Proceeding to store acceleration data. " );
         localStorage.addSensorData( values[0], values[1], values[2] );
     }
 

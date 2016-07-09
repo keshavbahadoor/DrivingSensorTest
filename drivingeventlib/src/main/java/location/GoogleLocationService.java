@@ -6,14 +6,12 @@ import android.content.pm.PackageManager;
 import android.location.Location;
 import android.os.Build;
 import android.os.Bundle;
-import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.content.LocalBroadcastManager;
 
 import com.google.android.gms.common.ConnectionResult;
-import com.google.android.gms.common.GooglePlayServicesUtil;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.LocationListener;
 import com.google.android.gms.location.LocationRequest;
@@ -24,18 +22,13 @@ import keshav.com.utilitylib.LogService;
 /**
  * Created by Keshav on 6/1/2016.
  */
-public class GoogleLocationService implements GoogleApiClient.ConnectionCallbacks,
+public class GoogleLocationService extends AbstractLocationService implements GoogleApiClient.ConnectionCallbacks,
                                               GoogleApiClient.OnConnectionFailedListener, LocationListener{
 
-    private long interval = LocationSettings.FAST_INTERVAL;
-
-    private long fastestInterval = LocationSettings.FAST_INTERVAL;
-
-    private int locationPriority = LocationRequest.PRIORITY_HIGH_ACCURACY;
-
+    private long interval = LocationSettings.SLOW_INTERVAL;
+    private long fastestInterval = LocationSettings.SLOW_INTERVAL;
+    private int locationPriority = LocationRequest.PRIORITY_LOW_POWER;
     private static GoogleLocationService instance = null;
-
-    Handler h = new Handler();
 
     /**
      * Provides the entry point to Google Play services.
@@ -43,31 +36,10 @@ public class GoogleLocationService implements GoogleApiClient.ConnectionCallback
     private GoogleApiClient googleApiClient;
 
     /**
-     * Represents a geographical location.
-     */
-    private Location currentLocation;
-
-    /**
-     * Represents current location state
-     */
-    private LocationEnum currentLocationState;
-
-    /**
-     * Speed vehicle is moving
-     */
-    private float currentSpeed = 0F;
-    private float maxSpeed = 0F;
-    public double longitude;
-    public double latitude;
-
-
-    /**
      * Defines the quality of service of gathering location data
      */
     private LocationRequest locationRequest;
 
-
-    private Context context;
 
     /**
      * Constructor:
@@ -124,24 +96,37 @@ public class GoogleLocationService implements GoogleApiClient.ConnectionCallback
 
         if (googleApiClient.isConnected()) {
             LocationServices.FusedLocationApi.removeLocationUpdates( googleApiClient, this );
-            googleApiClient.disconnect();
+            googleApiClient.reconnect();
+        } else {
+            googleApiClient.connect();
         }
-        h.postDelayed (new Runnable(){
-
-            public void run(){
-                googleApiClient.connect();
-            }
-
-        }, 2000);
-
     }
 
+    @Override
+    public void setHighAccuracy() {
+        changeAccuracy( LocationSettings.FAST_INTERVAL,
+                    LocationSettings.FAST_INTERVAL,
+                    LocationRequest.PRIORITY_HIGH_ACCURACY );
+    }
 
+    @Override
+    public void setLowAccuracy() {
+        changeAccuracy( LocationSettings.SLOW_INTERVAL,
+                    LocationSettings.SLOW_INTERVAL,
+                    LocationRequest.PRIORITY_LOW_POWER );
+    }
 
+    @Override
+    public void setMidAccuracy() {
+        changeAccuracy( LocationSettings.MEDIUM_INTERVAL,
+                    LocationSettings.MEDIUM_INTERVAL,
+                    LocationRequest.PRIORITY_BALANCED_POWER_ACCURACY );
+    }
 
     /**
      * This should be called on applicaion start event
      */
+    @Override
     public void onStartActions() {
         LogService.log( "Google Location services - onStartActions" );
         googleApiClient.connect();
@@ -151,14 +136,15 @@ public class GoogleLocationService implements GoogleApiClient.ConnectionCallback
         if (googleApiClient.isConnected()){
             LogService.log( "connected" );
         }
-
     }
 
     /**
      * This should be called on application stop event
      */
+    @Override
     public void onStopActions(){
         if ( googleApiClient.isConnected()){
+            LocationServices.FusedLocationApi.removeLocationUpdates( googleApiClient, this );
             googleApiClient.disconnect();
         }
     }
@@ -185,25 +171,8 @@ public class GoogleLocationService implements GoogleApiClient.ConnectionCallback
             return  ;
         }
         LocationServices.FusedLocationApi.requestLocationUpdates( googleApiClient, locationRequest, this );
-        
     }
 
-    /**
-     * updates speed, and calculates the current location state based on the given speed.
-     * @param location current location
-     */
-    private void updateSpeedAndLocationState(Location location) {
-        currentSpeed = location.getSpeed();
-        if ( currentSpeed <= LocationSettings.IN_VEHICLE_THRESHHOLD ) {
-            currentLocationState = LocationEnum.STATIONARY;
-        }
-        if ( currentSpeed > LocationSettings.IN_VEHICLE_THRESHHOLD ) {
-            currentLocationState = LocationEnum.IN_VEHICLE;
-        }
-        if ( currentSpeed > maxSpeed ) {
-            maxSpeed = currentSpeed;
-        }
-    }
 
     /**
      * Lets everyone know of our updated latitude, longitude and speed values.
@@ -229,17 +198,14 @@ public class GoogleLocationService implements GoogleApiClient.ConnectionCallback
         if (location == null) {
             return;
         }
-        this.latitude = location.getLatitude();
-        this.longitude = location.getLongitude();
+        currentLocation = location;
+        updateCoordinates();
 //        LogService.log( "LOCATION: " + location.getLatitude() );
 //        LogService.log( "LOCATION: " + location.getLongitude() );
 //        LogService.log( "SPEED: " + location.getSpeed() );
         LogService.log( "Location changed" );
-
-        currentLocation = location;
         updateSpeedAndLocationState(location);
         updateListeners();
-
     }
 
     @Override
@@ -253,30 +219,4 @@ public class GoogleLocationService implements GoogleApiClient.ConnectionCallback
         LogService.log("Google services connection failed: " + connectionResult.getErrorCode());
     }
 
-    public Location getCurrentLocation()    {
-        return currentLocation;
-    }
-
-    public double getLatitude()    {
-        if ( currentLocation != null) {
-            return currentLocation.getLatitude();
-        }
-        return 0.0;
-    }
-
-    public double getLongitude()    {
-        if ( currentLocation != null){
-            return currentLocation.getLongitude();
-        }
-        return 0.0;
-    }
-
-    public double getSpeed() {
-        if ( currentLocation != null) {
-            return currentLocation.getSpeed();
-        }
-        return 0.0;
-    }
-
-    public LocationEnum getLocationState(){return currentLocationState;}
 }

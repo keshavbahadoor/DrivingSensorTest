@@ -5,8 +5,9 @@ package location;
  */
 public interface ProjectDrivingLocationServices {
 
-    public void changeAccuracy(long updateTime, long updateDistance);
-    public void changeAccuracy(long interval, long fastestInterval, int priority);
+    public void setLowAccuracy();
+    public void setMidAccuracy();
+    public void setHighAccuracy();
     public void onStartActions();
     public void onStopActions();
     public void onDestroyActions();

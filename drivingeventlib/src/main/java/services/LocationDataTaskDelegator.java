@@ -23,7 +23,7 @@ public class LocationDataTaskDelegator extends DrivingServiceTaskDelegator imple
      */
     private static final long TIME_INTERVAL_GPS_DATA = 3000L;
     /**
-     * The time inbetween to check for weather updates. This is in hours
+     * The time in-between to check for weather updates. This is in hours
      */
     private static final int WEATHER_UPDATE_TIME_INTERVAL_HOURS = 2;
 
@@ -88,7 +88,7 @@ public class LocationDataTaskDelegator extends DrivingServiceTaskDelegator imple
     /**
      * If internet access is available, send data to server. otherwise, store data locally.
      * This is an old method - new thought: all data should be stored locally, and only
-     * synced when internet access is avaiable
+     * synced when internet access is available
      * @param latitude current latitude loc
      * @param longitude current longitude loc
      * @param speed current speed

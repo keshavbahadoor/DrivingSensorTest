@@ -23,6 +23,8 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.Toast;
 
+import com.google.android.gms.common.api.GoogleApiClient;
+
 import datasync.DataSyncAdapter;
 import datasync.SyncUtil;
 import location.CustomLocationListener;
@@ -40,6 +42,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private Toolbar toolbar;
     private DataSyncAdapter dataSyncAdapter;
     private Account mAccount;
+    public GoogleApiClient mApiClient;
 
     private DrivingService drivingService;
     private boolean mBounded;
@@ -128,7 +131,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             ContentResolver.addStatusChangeListener(1, this);
             ContentResolver.setIsSyncable( mAccount, SyncUtil.AUTHORITY, 1 );
             ContentResolver.setSyncAutomatically( mAccount, SyncUtil.AUTHORITY, true );
-            ContentResolver.addPeriodicSync( mAccount, SyncUtil.AUTHORITY, Bundle.EMPTY, 10 );
+            ContentResolver.addPeriodicSync( mAccount, SyncUtil.AUTHORITY, Bundle.EMPTY, 6000 );
         }
     }
 

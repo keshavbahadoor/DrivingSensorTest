@@ -1,5 +1,6 @@
 package user.management;
 
+import android.app.PendingIntent;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
@@ -16,8 +17,10 @@ import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.common.api.ResultCallback;
 import com.google.android.gms.common.api.Status;
+import com.google.android.gms.location.ActivityRecognition;
 
 import keshav.com.utilitylib.LogService;
+import services.ActivityRecognitionService;
 
 /**
  * Created by Keshav on 2/7/2016.
@@ -57,6 +60,7 @@ public class GooglePlusHandler implements GoogleApiClient.OnConnectionFailedList
             googleApiClient = new GoogleApiClient.Builder( context )
                     .enableAutoManage( mainActivity, this )
                     .addApi( Auth.GOOGLE_SIGN_IN_API, gso )
+                    .addApi( ActivityRecognition.API)
                     .addConnectionCallbacks( this )
                     .build();
             googleApiClient.connect();
@@ -186,6 +190,12 @@ public class GooglePlusHandler implements GoogleApiClient.OnConnectionFailedList
     @Override
     public void onConnected( Bundle bundle ) {
         LogService.log("Google APIs connected!");
+
+        Intent intent = new Intent( context, ActivityRecognitionService.class );
+        PendingIntent pendingIntent = PendingIntent.getService( context, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT );
+
+        // 3 seconds
+        ActivityRecognition.ActivityRecognitionApi.requestActivityUpdates( googleApiClient, 0, pendingIntent );
     }
 
     @Override

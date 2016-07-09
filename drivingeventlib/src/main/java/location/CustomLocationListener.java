@@ -22,6 +22,7 @@ import java.util.Calendar;
 /**
  * Created by Keshav on 10/11/2015.
  */
+@Deprecated
 public class CustomLocationListener implements LocationListener  {
 
 
@@ -183,10 +184,10 @@ public class CustomLocationListener implements LocationListener  {
             calculateSpeed = ( location.distanceTo( previousLocation ) / ( Calendar.getInstance().getTimeInMillis() - previousTimeStamp ) * 1000 );
             previousTimeStamp = Calendar.getInstance().getTimeInMillis();
 
-            if ( speed <= LocationSettings.IN_VEHICLE_THRESHHOLD ) {
+            if ( speed <= LocationSettings.IN_VEHICLE_THRESHOLD ) {
                 locationState = LocationEnum.STATIONARY;
             }
-            if ( speed > LocationSettings.IN_VEHICLE_THRESHHOLD ) {
+            if ( speed > LocationSettings.IN_VEHICLE_THRESHOLD ) {
                 locationState = LocationEnum.IN_VEHICLE;
             }
             if ( debugMode ) {
