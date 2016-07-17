@@ -2,11 +2,11 @@
 <items version="2" >
 
     <item
-        jar="C:\SRC\android\DrivingSensorTest\app\build\intermediates\exploded-aar\DrivingSensorTest\DrivingEventLib\1.5\jars\classes.jar"
+        jar="C:\SRC\android\DrivingSensorTest\app\build\intermediates\exploded-aar\DrivingSensorTest\DrivingEventLib\1.6\jars\classes.jar"
         jumboMode="false"
         revision="23.0.3"
-        sha1="1971576b45b796b8ee53e6fc6a608dd2f7d015a7">
-        <dex dex="C:\SRC\android\DrivingSensorTest\app\build\intermediates\pre-dexed\debug\DrivingSensorTest-DrivingEventLib-1.5_978003a0717299153b0dfbb782cacdaa24b8f96a.jar" />
+        sha1="a85749c28db3e9d2bf1ffbd62c638942307ec9f3">
+        <dex dex="C:\SRC\android\DrivingSensorTest\app\build\intermediates\pre-dexed\debug\DrivingSensorTest-DrivingEventLib-1.6_19ef5a5e6d358620b6b988e779b8436a08e94b67.jar" />
     </item>
 
 </items>

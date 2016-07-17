@@ -3,7 +3,6 @@ package fragments;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
-import android.content.IntentFilter;
 import android.os.Bundle;
 import android.support.design.widget.Snackbar;
 import android.util.Log;
@@ -12,13 +11,8 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
-import MessageEvents.AccelerationDataMessage;
-import services.DrivingPatternService;
 import services.SensorService;
 import com.driving.senor.test.R;
-
-import org.greenrobot.eventbus.EventBus;
-import org.greenrobot.eventbus.Subscribe;
 
 import keshav.com.utilitylib.LogService;
 import keshav.com.utilitylib.ServiceUtil;
@@ -94,7 +88,7 @@ public class SensorFragment extends android.support.v4.app.Fragment implements V
     @Override
     public void onStart() {
         super.onStart();
-        EventBus.getDefault().register( this );
+
     }
 
     @Override
@@ -135,7 +129,7 @@ public class SensorFragment extends android.support.v4.app.Fragment implements V
         //context.stopService( new Intent( context, SensorService.class ) );
         try {
             context.unregisterReceiver( receiver );
-            EventBus.getDefault().unregister( this );
+
         }
         catch ( Exception ex ) {
             LogService.log( "Receiver not registered" );
@@ -169,13 +163,7 @@ public class SensorFragment extends android.support.v4.app.Fragment implements V
         ( (TextView) fragment.findViewById( id3 ) ).setText( "Z: " + vals[2] );
     }
 
-    @Subscribe
-    public void onMessageEvent( AccelerationDataMessage message ) {
 
-        ( (TextView) fragment.findViewById( R.id.value_acc_X ) ).setText( "X: " + message.sensorVals[0] );
-        ( (TextView) fragment.findViewById( R.id.value_acc_Y ) ).setText( "Y: " + message.sensorVals[1] );
-        ( (TextView) fragment.findViewById( R.id.value_acc_Z ) ).setText( "Z: " + message.sensorVals[2] );
-    }
 
 
 }

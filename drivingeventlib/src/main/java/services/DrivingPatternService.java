@@ -11,8 +11,6 @@ import android.os.IBinder;
 import android.support.annotation.Nullable;
 import android.widget.Toast;
 
-import org.greenrobot.eventbus.EventBus;
-import org.greenrobot.eventbus.Subscribe;
 
 import MessageEvents.AccelerationDataMessage;
 import MessageEvents.GPSDataMessage;
@@ -75,7 +73,7 @@ public class DrivingPatternService extends Service implements SensorEventListene
     public void onDestroy() {
         super.onDestroy();
         this.sensorManager.unregisterListener( this );
-        EventBus.getDefault().unregister( this );
+//        EventBus.getDefault().unregister( this );
         customLocationListener.destroy();
         Toast.makeText( this.getApplicationContext(), "Driving Pattern service has ended", Toast.LENGTH_SHORT ).show();
     }
@@ -94,7 +92,7 @@ public class DrivingPatternService extends Service implements SensorEventListene
 //        if ( EventBus.getDefault().isRegistered( this ) ) {
 //            EventBus.getDefault().unregister( this );
 //        }
-        EventBus.getDefault().register( this );
+//        EventBus.getDefault().register( this );
         customLocationListener = CustomLocationListener.getInstance( this.getApplicationContext() );
         return START_STICKY;
     }
@@ -122,7 +120,7 @@ public class DrivingPatternService extends Service implements SensorEventListene
 
                 case Sensor.TYPE_ACCELEROMETER:
                     accelerationDataMessage.updateVals( SensorFilter.applyLowPassFilterRounded( SensorFilter.applyHighPassFilter( event.values ) ) );
-                    EventBus.getDefault().postSticky( accelerationDataMessage );
+//                    EventBus.getDefault().postSticky( accelerationDataMessage );
                     break;
 
 //                case Sensor.TYPE_GYROSCOPE:
@@ -133,24 +131,24 @@ public class DrivingPatternService extends Service implements SensorEventListene
         }
     }
 
-    /**
-     * Receives the current status of location. Based on this, the other functions can take place.
-     * @param status Current state
-     */
-    @Subscribe
-    public void onReceiveLocationEnum( LocationEnum status ) {
-        locationStatus = status;
-    }
-
-    /**
-     * When location listener is updated, the results are posted here. This is to be used
-     * with weather api (lat, long)
-     * @param dataMessage GPS data container class
-     */
-    @Subscribe
-    public void onReceiveGPSData( GPSDataMessage dataMessage ) {
-
-    }
+//    /**
+//     * Receives the current status of location. Based on this, the other functions can take place.
+//     * @param status Current state
+//     */
+//    @Subscribe
+//    public void onReceiveLocationEnum( LocationEnum status ) {
+//        locationStatus = status;
+//    }
+//
+//    /**
+//     * When location listener is updated, the results are posted here. This is to be used
+//     * with weather api (lat, long)
+//     * @param dataMessage GPS data container class
+//     */
+//    @Subscribe
+//    public void onReceiveGPSData( GPSDataMessage dataMessage ) {
+//
+//    }
 
 
 

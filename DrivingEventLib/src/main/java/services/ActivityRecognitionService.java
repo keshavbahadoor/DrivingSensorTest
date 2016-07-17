@@ -17,6 +17,8 @@ public class ActivityRecognitionService extends IntentService {
 
     public static final String BROADCAST_ACTION = "ActivityRecognitionBroadcast";
 
+    public static final int CONFIDENCE_THRESHOLD = 70;
+
     public ActivityRecognitionService() {
         super("ActivityRecognitionService");
     }
@@ -36,7 +38,7 @@ public class ActivityRecognitionService extends IntentService {
             int confidence = mostProbableActivity.getConfidence();
             int activityType = mostProbableActivity.getType();
 
-            if (confidence > 65){
+            if (confidence > CONFIDENCE_THRESHOLD){
 //                if (activityType == DetectedActivity.ON_FOOT) {
 //                    DetectedActivity betterActivity = walkingOrRunning( result.getProbableActivities() );
 //                    if (betterActivity != null) {

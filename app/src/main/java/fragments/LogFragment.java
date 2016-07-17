@@ -12,21 +12,10 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import com.driving.senor.test.R;
-import com.google.android.gms.location.ActivityRecognition;
 import com.google.android.gms.location.DetectedActivity;
-
-import org.greenrobot.eventbus.EventBus;
-import org.greenrobot.eventbus.Subscribe;
-import org.greenrobot.eventbus.ThreadMode;
-
 import datalayer.LocalStorage;
-import keshav.com.drivingeventlib.ServerRequests;
-import datalayer.StoredPrefsHandler;
-import keshav.com.utilitylib.DateUtil;
 import keshav.com.utilitylib.LogService;
 import services.ActivityRecognitionService;
-import weather.WeatherData;
-import weather.WeatherDataUtil;
 
 /**
  * Created by Keshav on 1/23/2016.
@@ -82,21 +71,10 @@ public class LogFragment extends android.support.v4.app.Fragment implements View
         return fragment;
     }
 
-    @Subscribe(sticky = true, threadMode = ThreadMode.MAIN)
-    public void updateUI(String str) {
-        WeatherData data = WeatherDataUtil.parseJson( str );
-        StoredPrefsHandler.storeWeatherData( this.getContext(), data );
-        data = StoredPrefsHandler.retrieveWeatherData( this.getContext() );
-        logWindow.append( "\nWeather Data:\n\n" + data.toString());
-        logWindow.append( "\nDate passed? : " + DateUtil.dateHasPassed( "2016-02-29 11:10:25 PM", +1 ) );
-    }
-
 
     @Override
     public void onStart() {
         super.onStart();
-        if (!EventBus.getDefault().isRegistered( this ))
-            EventBus.getDefault().register( this );
     }
 
     @Override
@@ -107,6 +85,5 @@ public class LogFragment extends android.support.v4.app.Fragment implements View
     @Override
     public void onDestroy() {
         super.onDestroy();
-        EventBus.getDefault().unregister( this );
     }
 }

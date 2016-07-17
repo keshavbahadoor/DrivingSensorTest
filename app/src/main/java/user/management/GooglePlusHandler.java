@@ -195,7 +195,7 @@ public class GooglePlusHandler implements GoogleApiClient.OnConnectionFailedList
         PendingIntent pendingIntent = PendingIntent.getService( context, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT );
 
         // 3 seconds
-        ActivityRecognition.ActivityRecognitionApi.requestActivityUpdates( googleApiClient, 0, pendingIntent );
+        ActivityRecognition.ActivityRecognitionApi.requestActivityUpdates( googleApiClient, 10000, pendingIntent );
     }
 
     @Override

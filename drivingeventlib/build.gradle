@@ -1,14 +1,17 @@
 apply plugin: 'com.android.library'
 
+// Increment this version when syncing to bintray
+version = '1.6.1'
+
 android {
-    compileSdkVersion 23
+    compileSdkVersion 24
     buildToolsVersion "23.0.3"
 
     defaultConfig {
         minSdkVersion 15
-        targetSdkVersion 23
+        targetSdkVersion 24
         versionCode 1
-        versionName "1.5"
+        versionName "1.6.1"
     }
     buildTypes {
         release {
@@ -24,18 +27,17 @@ android {
 dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
     testCompile 'junit:junit:4.12'
-    compile 'com.android.support:appcompat-v7:23.1.1'
+    //compile 'com.android.support:appcompat-v7:23.1.1'
     compile project(':SimpleRestClient')
     // compile project(':UtilityLib')
     compile 'DrivingSensorTest:UtilityLib:unspecified'
-    compile 'com.google.android.gms:play-services-location:9.0.2'
+    compile 'com.google.android.gms:play-services-location:9.2.0'
     compile 'com.squareup.retrofit2:retrofit:2.0.2'
     compile 'com.squareup.retrofit2:converter-gson:2.0.2'
     compile 'com.squareup.okhttp3:logging-interceptor:3.2.0'
 }
 
-// Increment this version when syncing to bintray
-version = '1.5'
+
 
 apply plugin: 'com.jfrog.bintray'
 apply plugin: 'com.github.dcendents.android-maven'
@@ -62,10 +64,10 @@ bintray {
         websiteUrl = 'https://github.com/keshavbahadoor/DrivingSensorTest'
 
         version {
-            name = 'android-util-pak'
-            desc = 'Utils'
+            name = 'driving-event-lib'
+            desc = 'driving-event-lib'
             released  = new Date()
-            vcsTag = '1.0'
+            vcsTag = '1.6.1'
         }
     }
     configurations = ['archives']

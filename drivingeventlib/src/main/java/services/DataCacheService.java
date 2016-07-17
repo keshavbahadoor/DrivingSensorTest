@@ -6,9 +6,6 @@ import android.os.IBinder;
 import android.support.annotation.Nullable;
 import android.util.Log;
 
-import org.greenrobot.eventbus.EventBus;
-import org.greenrobot.eventbus.Subscribe;
-import org.greenrobot.eventbus.ThreadMode;
 
 import MessageEvents.AccelerationDataMessage;
 import MessageEvents.GPSDataMessage;
@@ -58,45 +55,45 @@ public class DataCacheService extends Service implements OnTaskComplete {
     public int onStartCommand( Intent intent, int flags, int startId ) {
         super.onStartCommand( intent, flags, startId );
         syncScheduler.setSchedule( this );
-        EventBus.getDefault().register( this );
+//        EventBus.getDefault().register( this );
         return START_STICKY;
     }
 
     @Override
     public void onDestroy() {
-        EventBus.getDefault().unregister( this );
+//        EventBus.getDefault().unregister( this );
         super.onDestroy();
     }
 
-    /**
-     * Receives the current status of location. Based on this, the other functions can take place.
-     * @param status
-     */
-    @Subscribe
-    public void onReceiveLocationEnum( LocationEnum status ) {
-        locationStatus = status;
-    }
+//    /**
+//     * Receives the current status of location. Based on this, the other functions can take place.
+//     * @param status
+//     */
+//    @Subscribe
+//    public void onReceiveLocationEnum( LocationEnum status ) {
+//        locationStatus = status;
+//    }
 
-    @Subscribe(sticky = true, threadMode = ThreadMode.ASYNC)
-    public void onReceiveAccelerometerData( AccelerationDataMessage dataMessage ) {
-
-        if ( locationStatus == LocationEnum.IN_VEHICLE &&
-                (System.currentTimeMillis() - prevTime) > TIME_INTERVAL) {
-
-            LogService.log( "Proceeding to capture / store acceleration data. " );
-            if ( NetworkUtil.isNetworkAvailable( this.getApplicationContext() ) ) {
-                ServerRequests.postAccelerationData( this.getApplicationContext(),
-                        googleID,
-                        dataMessage.sensorVals[0],
-                        dataMessage.sensorVals[1],
-                        dataMessage.sensorVals[2] );
-            } else {
-                // store data locally
-                localStorage.addSensorData( dataMessage.sensorVals[0], dataMessage.sensorVals[1], dataMessage.sensorVals[2] );
-            }
-            prevTime = System.currentTimeMillis();
-        }
-    }
+//    @Subscribe(sticky = true, threadMode = ThreadMode.ASYNC)
+//    public void onReceiveAccelerometerData( AccelerationDataMessage dataMessage ) {
+//
+//        if ( locationStatus == LocationEnum.IN_VEHICLE &&
+//                (System.currentTimeMillis() - prevTime) > TIME_INTERVAL) {
+//
+//            LogService.log( "Proceeding to capture / store acceleration data. " );
+//            if ( NetworkUtil.isNetworkAvailable( this.getApplicationContext() ) ) {
+//                ServerRequests.postAccelerationData( this.getApplicationContext(),
+//                        googleID,
+//                        dataMessage.sensorVals[0],
+//                        dataMessage.sensorVals[1],
+//                        dataMessage.sensorVals[2] );
+//            } else {
+//                // store data locally
+//                localStorage.addSensorData( dataMessage.sensorVals[0], dataMessage.sensorVals[1], dataMessage.sensorVals[2] );
+//            }
+//            prevTime = System.currentTimeMillis();
+//        }
+//    }
 
     /**
      * Ensures that the data received from GPS is stored either locally, or sent to the server.
@@ -109,40 +106,40 @@ public class DataCacheService extends Service implements OnTaskComplete {
      *          TODO : no weather data captured if network access is unavailable
      * @param dataMessage Data container received from Location Listener
      */
-    @Subscribe(sticky = true, threadMode = ThreadMode.ASYNC)
-    public void onReceiveGPSData( GPSDataMessage dataMessage ) {
-
-        LogService.log( "received GPS data" );
-
-        // Update Weather data using received GPS data
-        // Note that weather data is only updated every 2 hours
-        WeatherData data = StoredPrefsHandler.retrieveWeatherData( this.getApplicationContext() );
-        if (data.date.length() == 0 && DateUtil.dateHasPassed( data.date, 0 )) {
-            LogService.log( "Updating weather data..." );
-            ServerRequests.getCurrentWeatherData( this.getApplicationContext(), this, "" + dataMessage.latitude, "" + dataMessage.longitude );
-        }
-
-        if ( locationStatus == LocationEnum.IN_VEHICLE &&
-                (System.currentTimeMillis() - prevTimeGPS) > TIME_INTERVAL_GPS_DATA) {
-            LogService.log( "Proceeding to capture / store GPS data. " );
-
-            if ( NetworkUtil.isNetworkAvailable( this.getApplicationContext() ) ) {
-
-//                ServerRequests.postGPSData( this.getApplicationContext(),
-//                        googleID,
-//                        "" + dataMessage.latitude,
-//                        "" + dataMessage.longitude,
-//                        dataMessage.speed );
-            } else {
-                // store data locally
-                //localStorage.addGPSData( "" + dataMessage.latitude, "" + dataMessage.longitude, dataMessage.speed );
-            }
-            prevTimeGPS = System.currentTimeMillis();
-        }
-
-        // Update current data variable
-        currentGPSData = dataMessage;
-    }
+//    @Subscribe(sticky = true, threadMode = ThreadMode.ASYNC)
+//    public void onReceiveGPSData( GPSDataMessage dataMessage ) {
+//
+//        LogService.log( "received GPS data" );
+//
+//        // Update Weather data using received GPS data
+//        // Note that weather data is only updated every 2 hours
+//        WeatherData data = StoredPrefsHandler.retrieveWeatherData( this.getApplicationContext() );
+//        if (data.date.length() == 0 && DateUtil.dateHasPassed( data.date, 0 )) {
+//            LogService.log( "Updating weather data..." );
+//            ServerRequests.getCurrentWeatherData( this.getApplicationContext(), this, "" + dataMessage.latitude, "" + dataMessage.longitude );
+//        }
+//
+//        if ( locationStatus == LocationEnum.IN_VEHICLE &&
+//                (System.currentTimeMillis() - prevTimeGPS) > TIME_INTERVAL_GPS_DATA) {
+//            LogService.log( "Proceeding to capture / store GPS data. " );
+//
+//            if ( NetworkUtil.isNetworkAvailable( this.getApplicationContext() ) ) {
+//
+////                ServerRequests.postGPSData( this.getApplicationContext(),
+////                        googleID,
+////                        "" + dataMessage.latitude,
+////                        "" + dataMessage.longitude,
+////                        dataMessage.speed );
+//            } else {
+//                // store data locally
+//                //localStorage.addGPSData( "" + dataMessage.latitude, "" + dataMessage.longitude, dataMessage.speed );
+//            }
+//            prevTimeGPS = System.currentTimeMillis();
+//        }
+//
+//        // Update current data variable
+//        currentGPSData = dataMessage;
+//    }
 
     /**
      * Rest server task completed callback

@@ -241,7 +241,7 @@ public class DrivingService extends Service implements SensorEventListener  {
             addDetectedActivity( activity );
 
             // use activity recognition instead of location based state:
-            if ( allActivitiesContains( DetectedActivity.IN_VEHICLE )) {
+            if ( !allActivitiesContains( DetectedActivity.IN_VEHICLE ) ) {
                 locationService.setHighAccuracy();
                 locationState = LocationEnum.IN_VEHICLE;
             } else {
